@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=6gb
+#PBS -l walltime=24:00:00
+#PBS -q short
+#PBS -t 1-100
+#PBS -j oe
+#PBS -o ~/hla_rnaseq_pipeline/3-kallisto_pipeline/log/round1.$PBS_JOBID.log
+
+cd $PBS_O_WORKDIR
+
+mkdir -p ./log
+mkdir -p ./quantifications_1
+
+SAMPLE=`awk "FNR==$PBS_ARRAYID" ../data/sample_ids.txt`
+
+./quantify_round1.sh $SAMPLE

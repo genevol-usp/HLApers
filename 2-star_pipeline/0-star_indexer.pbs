@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=12
+#PBS -l mem=32gb
+#PBS -l walltime=12:00:00
+#PBS -q short
+#PBS -j oe
+#PBS -o ~/hla_rnaseq_pipeline/star_pipeline/index.log
+
+cd $PBS_O_WORKDIR
+
+STAR=~/STAR
+
+indexDIR=./index
+fasta=../1-index_preparation/gencode.v25.PRI.IMGT.transcripts.fa
+
+mkdir -p $indexDIR
+
+$STAR --runThreadN 12 --runMode genomeGenerate --genomeDir $indexDIR\
+  --genomeFastaFiles $fasta --genomeChrBinNbits 10 --genomeSAindexNbases 13
