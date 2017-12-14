@@ -34,6 +34,8 @@ Notes:
 - Users can choose between the faster kallisto and the STAR-Salmon pipeline.
   If STAR-Salmon is your choice, there is no need to install kallisto. 
 
+- Scripts assume RSEM cloned from GitHub to the home directory
+  (https://github.com/deweylab/RSEM.git)
 
 ## Download data:
 
