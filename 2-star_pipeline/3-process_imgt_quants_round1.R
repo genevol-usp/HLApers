@@ -1,4 +1,5 @@
-devtools::load_all("~/hlaseqlib")
+#devtools::load_all("~/hlaseqlib")
+library(hlaseqlib)
 library(tidyverse)
 
 hla_genes <- gencode_hla$gene_name 
