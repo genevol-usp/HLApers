@@ -44,5 +44,5 @@ we replace the HLA isoforms with IMGT HLA allele sequences.
 cd ./1-index_preparation
 
 ```
-project
+tree 
 ```
