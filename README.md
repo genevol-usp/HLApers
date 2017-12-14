@@ -26,10 +26,10 @@
 
 Notes:
 
-- The hlaseqlib R package is under development. It can be installed with the
-  command devtools::install\_github("vitoraguiar/hlaseqlib") inside R. As an
-  alternative, if the user want to get the latest updates, we advise the user to
-  clone the repository and, instead of loading the package with the standard
+- The hlaseqlib R package is under active development. It can be installed with
+  the command devtools::install\_github("vitoraguiar/hlaseqlib") inside R. As an
+  alternative, in order to get the latest updates, we advise the user to clone
+  the repository and, instead of loading the package with the standard
   "library()" function in R, use "devtools::load\_all(path\_to\_directory)".
 
 - Users can choose between the faster kallisto and the STAR-Salmon pipeline.
