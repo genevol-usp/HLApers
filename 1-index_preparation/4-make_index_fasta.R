@@ -1,5 +1,5 @@
 library(Biostrings)
-devtools::load_all("~/hlaseqlib")
+library(hlaseqlib)
 library(tidyverse)
 
 imgt <- readDNAStringSet("./imgt_index.fa") 

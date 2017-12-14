@@ -1,4 +1,4 @@
-devtools::load_all("~/hlaseqlib")
+library(hlaseqlib)
 library(Biostrings)
 library(tidyverse)
 
