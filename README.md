@@ -32,7 +32,7 @@ Notes:
   the repository and, instead of loading the package with the standard
   "library()" function in R, use "devtools::load\_all(path\_to\_directory)".
 
-- Users can choose between the faster kallisto and the STAR-Salmon pipeline.
+- Users can choose the faster kallisto pipeline, or the STAR-Salmon pipeline.
   If STAR-Salmon is your choice, there is no need to install kallisto. 
 
 - Scripts assume that the executables or directories of the programs above are
@@ -146,10 +146,10 @@ in structure.
 cd 2-star_pipeline
 ```
 
-The next script must be executed when all the jobs from the previous script are
-finished. Or a pipeline.sh script can be made adding dependencies according to
-your cluster (i.e., execute script 2 afterok jobs from script 1).
-
+We need to run 8 scripts. The next script must be executed when all the jobs
+from the previous script are finished. Or a pipeline.sh script can be made
+adding dependencies according to your cluster (i.e., execute script 2 after all
+jobs from script 1 were finished OK).
 
 1. Build STAR index:
 
@@ -199,7 +199,7 @@ qsub 5-map_and_quantify_round2.pbs
 ```
 
 This script, and the executable "map\_and\_quantify\_round1.sh", must be edited
-just like the version of these scripts for the round 1 to suit the number of
+just like the version of these scripts for the round 1 to suit your number of
 samples, fastq names etc.
 
 7. After all quantification jobs are finished, compile the results:
