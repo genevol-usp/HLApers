@@ -4,16 +4,14 @@ library(tidyverse)
 
 main_loci <- c("A", "B", "C", "DPB1", "DQA1", "DQB1", "DRB")
 
-other_loci <-
-    list.files("~/IMGTHLA/alignments/", pattern = "_nuc\\.txt") %>% 
+other_loci <- list.files("~/IMGTHLA/alignments/", pattern = "_nuc\\.txt") %>% 
     strsplit("_") %>% 
     map_chr(1) %>%
     .[! . %in% c(main_loci, "ClassI", "ClassII")]
 
-loci_df <- 
-    tibble(locus = c(main_loci, other_loci)) %>%
+loci_df <- tibble(locus = c(main_loci, other_loci)) %>%
     mutate(infer = locus %in% main_loci,
-	   seqs = map2(locus, infer, hla_make_sequences, n_cores = 16)) 
+	   seqs = map2(locus, infer, hla_make_sequences, n_cores = 1)) 
 
 seqs_df <- select(loci_df, seqs) %>% unnest()
 
