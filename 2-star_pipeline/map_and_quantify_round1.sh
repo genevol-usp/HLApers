@@ -25,6 +25,11 @@ $STAR --runMode alignReads --runThreadN 6 --genomeDir $indexDIR\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix $outPrefix
 
+# These parameters were optimized for 2x75bp reads
+# For 2x125bp reads I use instead:
+# --outFilterMultimapNmax 1500
+# --winAnchorMultimapNmax 3000
+
 bam=${outPrefix}Aligned.out.bam
 fasta=../1-index_preparation/gencode.v25.PRI.IMGT.transcripts.fa
 out=$outQuant/$sample
