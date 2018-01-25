@@ -6,4 +6,4 @@ outdir=./sample_indices
 
 mkdir -p $outdir
 
-Rscript $write_custom_index ./quantifications_1/processed_quant.tsv $outdir
+Rscript $write_custom_index ./quantifications_1/processed_imgt_quants.tsv $outdir
