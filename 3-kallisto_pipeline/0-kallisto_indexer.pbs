@@ -5,13 +5,15 @@
 #PBS -l walltime=12:00:00
 #PBS -q short
 #PBS -j oe
-#PBS -o ~/hla_rnaseq_pipeline/kallisto_pipeline/index.log
+#PBS -o ~/hla_rnaseq_pipeline/3-kallisto_pipeline/index.log
 
 cd $PBS_O_WORKDIR
+
+mkdir ./index
 
 kallisto=~/kallisto_linux-v0.43.1/kallisto 
 
 fasta=../1-index_preparation/gencode.v25.PRI.IMGT.transcripts.fa
-out=./gencode.v25.PRI.IMGT.transcripts.idx
+out=./index/gencode.v25.PRI.IMGT.transcripts.idx
 
 $kallisto index -i $out $fasta

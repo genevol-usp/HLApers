@@ -14,4 +14,4 @@ mkdir -p ./quantifications_2
 
 SAMPLE=`awk "FNR==$PBS_ARRAYID" ../data/sample_ids.txt`
 
-./kallisto_quant_round2.sh $SAMPLE
+./quantify_round2.sh $SAMPLE
