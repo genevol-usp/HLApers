@@ -9,7 +9,7 @@ samples <- readLines("../data/sample_ids.txt")
 imgt_quants <- read_tsv("./quantifications_1/imgt_quants.tsv") %>%
     mutate(locus = imgt_to_gname(target_id),
 	   gene_id = gname_to_gid(locus)) %>%
-    select(locus, gene_id, allele = target_id, est_counts, tpm)
+    select(subject, locus, gene_id, allele = target_id, est_counts, tpm)
 
 missing_files <- samples[! samples %in% imgt_quants$subject]
 
