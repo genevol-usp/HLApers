@@ -43,13 +43,7 @@ Notes:
 
 *scripts assume IMGT repository cloned in home directory*
 
-Currently, the pipeline is tested with IMGT v3.29.0. To download this version:
-
-```
-git clone -b 3290 https://github.com/ANHIG/IMGTHLA.git
-```
-
-Or, to download latest version:
+Download latest IMGT data:
 
 ```
 git clone https://github.com/ANHIG/IMGTHLA.git
@@ -82,7 +76,7 @@ The first step is to build an index composed of Gencode v25 transcripts, where
 we replace the HLA isoforms with IMGT HLA allele sequences.
 
 ```
-cd ./1-index_preparation
+cd ./1-index_preparation_v2
 ```
 
 By executing 
@@ -101,36 +95,31 @@ in order to generate a fasta file with transcript sequences.
 qsub 2-rsem_prepare_PRI.pbs
 ```
 
-Next, we build a fasta with HLA sequences by processing the IMGT alignments.
+Next, we create a list of HLA genes which will be processed in the pipeline:
+
 
 ```
-Rscript 3-make_imgt_index.R
+Rscript 3-write_imgt_loci.R
 ```
 
-In this script, we hard code the names of HLA genes for which we want to infer 
-exon sequences which are missing in IMGT.
+Then, we process the coding sequences for these genes, inferring the missing
+parts. We submit each gene as a job in the cluster:
 
-line nº 5:
-```
-main_loci <- c("A", "B", "C", "DPB1", "DQA1", "DQB1", "DRB")
-```
-
-The user may want to modify that list. Genes not listed here only contribute
-with the alleles for which the complete sequence is available from IMGT.
-
-This script is very inefficient (it takes 2h20 on our machine with a single
-core), and if the users are allowed by their clusters to use more CPUs when
-executing this script, we advise to modify the n\_cores argument on line 14 to
-something like:
 
 ```
-map2(locus, infer, hla_make_sequences, n_cores = 16)
+qsub 4-make_imgt_index.R
+```
+
+When all jobs are finished, we compile a fasta file:
+
+```
+Rscript 5-write_index_fasta.R
 ```
 
 Finally, we execute:
 
 ```
-Rscript 4-make_index_fasta.R
+Rscript 6-make_gencode_fastas.R
 ```
 
 This script creates 2 fasta files that will be used by the aligners to build the

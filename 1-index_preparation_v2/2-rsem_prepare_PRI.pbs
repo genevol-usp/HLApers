@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=8gb
+#PBS -l walltime=01:00:00
+#PBS -q short
+#PBS -j oe
+#PBS -o ~/hla_rnaseq_pipeline/1-index_preparation_v2/rsem_pri_index.log
+
+cd $PBS_O_WORKDIR
+cd ./gencode
+
+rsem=~/RSEM
+
+genome=GRCh38.primary_assembly.genome.fa
+gtf=gencode.v25.primary_assembly.annotation.gtf
+out=gencode.v25.PRI
+
+zcat $genome.gz > $genome
+zcat $gtf.gz > $gtf
+
+$rsem/rsem-prepare-reference --gtf $gtf $genome $out
+
+rm $out.grp $out.ti $out.chrlist $out.seq $out.idx.fa $out.n2g.idx.fa $genome $gtf
