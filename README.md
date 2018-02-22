@@ -76,7 +76,7 @@ The first step is to build an index composed of Gencode v25 transcripts, where
 we replace the HLA isoforms with IMGT HLA allele sequences.
 
 ```
-cd ./1-index_preparation_v2
+cd ./1-index_preparation
 ```
 
 By executing 
