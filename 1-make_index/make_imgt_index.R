@@ -42,13 +42,12 @@ if (nrow(hla_df) == 1L || all(!grepl("\\*", hla_df$cds))) {
 	map(make_closest_allele_df) %>%
 	bind_rows()
 
-    closest_within_type <- closest_allele_df_step2 %>%
-	find_closest_within_type()
+    closest_within_type <- find_closest_within_type(closest_allele_df_step2)
 
     inferred_df <- closest_within_type %>%
 	left_join(hla_df, by = c("inc_allele" = "allele")) %>%
 	left_join(hla_df, by = c("closest" = "allele")) %>%
-	mutate(cds = purrr::map2_chr(cds.x, cds.y, hla_attribute_seq)) %>%
+	mutate(cds = map2_chr(cds.x, cds.y, hla_attribute_seq)) %>%
 	select(allele = inc_allele, cds)
 
     final_df <- hla_df %>%

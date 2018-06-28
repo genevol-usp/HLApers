@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=12
+#PBS -l mem=32gb
+#PBS -l walltime=12:00:00
+#PBS -q short
+#PBS -j oe
+#PBS -o ~/hlatx/1-make_index/log/genome.log
+
+STAR=~/STAR
+
+indexDIR=./genome_index
+genome=./gencode/GRCh38.primary_assembly.genome.fa
+gtf=./gencode/gencode.v25.primary_assembly.annotation.gtf
+overhang=75
+
+cd $PBS_O_WORKDIR
+
+mkdir -p $indexDIR
+
+zcat $genome.gz > $genome
+zcat $gtf.gz > $gtf
+
+$STAR --runThreadN 12 --runMode genomeGenerate --genomeDir $indexDIR\
+  --genomeFastaFiles $genome --sjdbGTFfile $gtf --sjdbOverhang $overhang 
+
+rm $genome $gtf
