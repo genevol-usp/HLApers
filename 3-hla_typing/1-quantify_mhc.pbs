@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=36gb
+#PBS -l walltime=24:00:00
+#PBS -q short
+#PBS -t 1-358
+#PBS -j oe
+#PBS -o ~/hlatx/3-hla_typing/log/$PBS_JOBID.log
+
+cd $PBS_O_WORKDIR
+
+mkdir -p ./log
+mkdir -p ./mappings
+mkdir -p ./quantifications_MHC
+
+SAMPLE=`awk "FNR==$PBS_ARRAYID" ../data/sample_ids.txt`
+
+./quantify_mhc.sh $SAMPLE 

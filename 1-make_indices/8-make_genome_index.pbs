@@ -5,7 +5,7 @@
 #PBS -l walltime=12:00:00
 #PBS -q short
 #PBS -j oe
-#PBS -o ~/hlatx/1-make_index/log/genome.log
+#PBS -o ~/hlatx/1-make_indices/log/genome.log
 
 STAR=~/STAR
 

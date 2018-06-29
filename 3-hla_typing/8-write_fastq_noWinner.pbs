@@ -1,0 +1,47 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=1gb
+#PBS -l walltime=24:00:00
+#PBS -q short
+#PBS -t 1-358
+#PBS -j oe
+#PBS -o ~/hlatx/3-hla_typing/log/$PBS_JOBID.log
+
+cd $PBS_O_WORKDIR
+
+seqtk=~/seqtk/seqtk
+
+fqdir=./fastq_noWinner
+
+mkdir -p $fqdir
+
+SAMPLE=`awk "FNR==$PBS_ARRAYID" ../data/sample_ids.txt`
+
+quantDir=./quantifications_topAlleles
+sampledir=$quantDir/$SAMPLE
+winners=$sampledir/winner.txt
+mappings=$sampledir/mappings.sam
+readsWin=$sampledir/readsWin.txt
+readsNoWin=$sampledir/readsNoWin.txt
+
+grep -v "^@" $mappings |\
+    grep -F -f $winners - |\
+    cut -f1 |\
+    sort |\
+    uniq > $readsWin
+
+grep -v "^@" $mappings |\
+    cut -f1 |\
+    awk 'FNR==NR {hash[$0]; next} !($0 in hash)' $readsWin - |\
+    sort |\
+    uniq > $readsNoWin
+
+fq1=../2-map_to_genome/mappings/mhc_fqs/${SAMPLE}_1.fq
+fq2=../2-map_to_genome/mappings/mhc_fqs/${SAMPLE}_2.fq
+
+fq12=$fqdir/${SAMPLE}_1.fq
+fq22=$fqdir/${SAMPLE}_2.fq
+
+$seqtk subseq $fq1 $readsNoWin > $fq12
+$seqtk subseq $fq2 $readsNoWin > $fq22

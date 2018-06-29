@@ -6,7 +6,7 @@
 #PBS -q short
 #PBS -t 1-22
 #PBS -j oe
-#PBS -o ~/hlatx/hlatx/1-make_index/log/$PBS_JOBID.log
+#PBS -o ~/hlatx/1-make_indices/log/$PBS_JOBID.log
 
 cd $PBS_O_WORKDIR
 

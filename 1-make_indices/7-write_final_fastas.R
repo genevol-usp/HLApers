@@ -48,3 +48,12 @@ gencode_imgt <- c(gencode_no_imgt, imgt)
 
 writeXStringSet(gencode_imgt, "./gencode.v25.PRI.IMGT.transcripts.fa")
 writeXStringSet(gencode_no_imgt, "./gencode.v25.PRI.transcripts.noIMGT.fa")
+
+mhc_tx <- gencode_pri_tx %>%
+    filter(start >= 29722000L, end <= 33144000L, !gene_name %in% loci_in_index) %>%
+    pull(tx_id)
+
+gencode_mhc <- gencode_imgt %>%
+    .[grepl("IMGT", names(.)) | names(.) %in% mhc_tx]
+
+writeXStringSet(gencode_mhc, "./gencode/gencode.v25.MHC.IMGT.transcripts.fa")
