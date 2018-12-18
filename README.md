@@ -20,6 +20,8 @@
 
 - Salmon v0.8.2+
 
+- samtools 1.3+
+
 
 Notes:
 
