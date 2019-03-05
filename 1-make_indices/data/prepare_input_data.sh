@@ -2,6 +2,7 @@
 
 # create dir gencode
 mkdir -p ./gencode
+mkdir -p ./hladb
 
 # download genome and annotations
 wget ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_25/GRCh38.primary_assembly.genome.fa.gz -P ./gencode

@@ -1,6 +1,6 @@
 suppressMessages(devtools::load_all("~/Libraries/hlaseqlib"))
-suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(Biostrings))
+suppressPackageStartupMessages(library(tidyverse))
 
 imgt_db <- "./data/IMGTHLA"
 
@@ -33,11 +33,11 @@ hladb <- tibble(locus = pers_index_loci) %>%
     map_chr("cds") %>%
     DNAStringSet()
 
-message("All HLA loci processed successfully!")
-message("Writing index files...")
+writeXStringSet(hladb, "./data/hladb/hladb.fasta")
 
 hladb_genes <- unique(imgt_to_gname(names(hladb)))
 
+message("Processing Gencode annotations...")
 hla_tx <- "./data/gencode/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "exon") %>%
     filter(gene_name %in% hladb_genes) %>%
@@ -71,11 +71,23 @@ gencode_no_hla <- gencode[! names(gencode) %in% hladb_tx_rm$tx_id]
   
 gencode_hlasupp <- c(gencode_no_hla, hladb) 
 
+message("Writing index files...")
+
 writeXStringSet(gencode_hlasupp, "./data/gencode/gencode.v25.PRI.IMGT.transcripts.fa")
 writeXStringSet(gencode_no_hla, "./data/gencode/gencode.v25.PRI.transcripts.noIMGT.fa")
 
+mhc_coords <- gencode_pri_gene %>%
+    filter(gene_name %in% hladb_genes) %>%
+    summarise(start = min(start) -1e6, end = max(end) + 1e6)
+
+mhc_coords %>%
+    mutate(out = paste0("chr6:", start, "-", end)) %>%
+    pull(out) %>%
+    writeLines("mhc_coords.txt")
+
 mhc_tx <- gencode_pri_tx %>%
-    filter(start >= 25000000L, end <= 35000000L, !gene_name %in% hladb_genes) %>%
+    filter(start >= mhc_coords$start, end <= mhc_coords$end, 
+	   !gene_name %in% hladb_genes) %>%
     pull(tx_id)
 
 gencode_mhc <- gencode_hlasupp %>%
