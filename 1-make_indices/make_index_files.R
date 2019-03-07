@@ -38,45 +38,54 @@ writeXStringSet(hladb, "./data/hladb/hladb.fasta")
 hladb_genes <- unique(imgt_to_gname(names(hladb)))
 
 message("Processing Gencode annotations...")
+tx_types_rm <- c("pseudogene", "processed_pseudogene", "unprocessed_pseudogene")
+
+filtered_annots <- gencode_pri_tx %>% filter(! tx_type %in% tx_types_rm)
+
 hla_tx <- "./data/gencode/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "exon") %>%
-    filter(gene_name %in% hladb_genes) %>%
+    filter(gene_name %in% hladb_genes, tx_id %in% filtered_annots$tx_id) %>%
     mutate(pos = map2(start, end, `:`)) %>%
     unnest()
     
 hla_coding <- hla_tx %>%
     filter(tx_type == "protein_coding")
 
-hla_non_coding <- hla_tx %>%
+hla_noncoding <- hla_tx %>%
     filter(tx_type != "protein_coding")
 
-hlatx_to_keep <- hla_non_coding %>%
+hlatx_noncoding_keep <- hla_noncoding %>%
     group_by(tx_id) %>%
     filter(!any(pos %in% hla_coding$pos)) %>%
     distinct(gene_name, tx_id) %>%
     pull(tx_id)
 
-tx_types_rm <- c("pseudogene", "processed_pseudogene", "unprocessed_pseudogene")
-
-filtered_annots <- gencode_pri_tx %>% filter(! tx_type %in% tx_types_rm)
-
 gencode <- readDNAStringSet("./data/gencode/gencode.v25.PRI.transcripts.fa") %>%
-    .[names(.) %in% filtered_annots$tx_id] %>%
-    unique()
+    .[filtered_annots$tx_id]
 
-hladb_tx_rm <- gencode_pri_tx %>%
-    filter(gene_name %in% hladb_genes, ! tx_id %in% hlatx_to_keep)
- 
-gencode_no_hla <- gencode[! names(gencode) %in% hladb_tx_rm$tx_id] 
-  
-gencode_hlasupp <- c(gencode_no_hla, hladb) 
+gencode_no_hla <- filtered_annots %>%
+    filter(! gene_name %in% hladb_genes | tx_id %in% hlatx_noncoding_keep) %>%
+    pull(tx_id) %>%
+    gencode[.]
+
+gencode_no_hla_uniq <-
+    tibble(tx_id = names(gencode_no_hla), 
+	   cds = as.character(gencode_no_hla)) %>%
+    group_by(cds) %>%
+    summarise(tx_id = paste(tx_id, collapse = "-")) %>%
+    ungroup() %>%
+    split(.$tx_id) %>%
+    map_chr("cds") %>%
+    DNAStringSet()
+
+gencode_hlasupp <- c(gencode_no_hla_uniq, hladb) 
 
 message("Writing index files...")
 
 writeXStringSet(gencode_hlasupp, "./data/gencode/gencode.v25.PRI.IMGT.transcripts.fa")
-writeXStringSet(gencode_no_hla, "./data/gencode/gencode.v25.PRI.transcripts.noIMGT.fa")
+writeXStringSet(gencode_no_hla_uniq, "./data/gencode/gencode.v25.PRI.transcripts.noIMGT.fa")
 
-mhc_coords <- gencode_pri_gene %>%
+mhc_coords <- filtered_annots %>%
     filter(gene_name %in% hladb_genes) %>%
     summarise(start = min(start) -1e6, end = max(end) + 1e6)
 
@@ -85,13 +94,23 @@ mhc_coords %>%
     pull(out) %>%
     writeLines("mhc_coords.txt")
 
-mhc_tx <- gencode_pri_tx %>%
-    filter(start >= mhc_coords$start, end <= mhc_coords$end, 
-	   !gene_name %in% hladb_genes) %>%
+mhc_tx <- filtered_annots %>%
+    filter(chr == 6, start >= mhc_coords$start, end <= mhc_coords$end, 
+	   tx_id %in% names(gencode_no_hla)) %>%
     pull(tx_id)
 
-gencode_mhc <- gencode_hlasupp %>%
-    .[grepl("IMGT", names(.)) | names(.) %in% mhc_tx]
+gencode_mhc <-
+    tibble(tx_id = names(gencode_no_hla), 
+	   cds = as.character(gencode_no_hla)) %>%
+    filter(tx_id %in% mhc_tx) %>%
+    group_by(cds) %>%
+    summarise(tx_id = paste(tx_id, collapse = "-")) %>%
+    ungroup() %>%
+    split(.$tx_id) %>%
+    map_chr("cds") %>%
+    DNAStringSet()
 
-writeXStringSet(gencode_mhc, "./data/gencode/gencode.v25.MHC.IMGT.transcripts.fa")
+gencode_mhc_supp <- c(gencode_mhc, hladb)
+
+writeXStringSet(gencode_mhc_supp, "./data/gencode/gencode.v25.MHC.IMGT.transcripts.fa")
 message("Done!")
