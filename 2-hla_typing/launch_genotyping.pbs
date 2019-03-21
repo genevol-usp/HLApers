@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#PBS -l nodes=1:ppn=1
-#PBS -l mem=36gb
+#PBS -l nodes=1:ppn=8
+#PBS -l mem=16gb
 #PBS -l walltime=24:00:00
 #PBS -q short
 #PBS -t 1
@@ -14,4 +14,4 @@ mkdir -p ./log
 
 SAMPLE=`awk "FNR==$PBS_ARRAYID" ../map_to_genome/samples.txt`
 
-./quantify_mhc.sh $SAMPLE $PBS_NUM_PPN
+./run_genotyping.sh $SAMPLE $PBS_NUM_PPN

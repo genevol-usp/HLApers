@@ -3,9 +3,7 @@ library(tidyverse)
 
 quants_1st <- commandArgs(TRUE)[1]
 quants_2nd <- commandArgs(TRUE)[2]
-outdir <- commandArgs(TRUE)[3] 
-
-outgenos <- file.path(outdir, "genotypes.tsv")
+outgenos <- commandArgs(TRUE)[3] 
 
 typings_1st <- quants_1st %>% 
     read_tsv() %>%
