@@ -17,7 +17,7 @@ fqmhc2=${outPrefix}mhc_2.fq
 indexDIR=/home/vitor/hlapers/1-make_indices/indices/star
 bammhcPrefix=${outPrefix}MHC_
 bammhc=${bammhcPrefix}Aligned.out.bam
-outmhc=${outPrefix}MHC_quants
+outmhc=${bammhcPrefix}quants
 persindex=${outPrefix}persindex
 persfasta=$persindex/hla.fa
 outtop5=${outPrefix}top5_quants
@@ -113,3 +113,7 @@ salmon quant -i $persindex/salmon -l IU -1 $fqnoWin1 -2 $fqnoWin2\
 #Final gentotypes and personalized index
 Rscript final_genotype.R $outtop5/quant.sf $outNoWin/quant.sf ${outPrefix}genotypes.tsv 
 Rscript write_genotyped_alleles.R ${outPrefix}genotypes.tsv ${outPrefix}index.fa
+
+rm -r $readids $readsalign $readsunmap $fqmhc1 $fqmhc2 $bammhc $outmhc \
+    ${bammhcPrefix}SJ.out.tab $persindex $outtop5 $readsWin $readsNoWin \
+    $fqnoWin1 $fqnoWin2 $outNoWin $bam $bam.bai
