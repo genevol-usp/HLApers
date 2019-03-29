@@ -6,12 +6,19 @@
 #PBS -q short
 #PBS -t 1
 #PBS -j oe
-#PBS -o /home/vitor/hlapers/2-hla_typing/log/$PBS_JOBID.log.txt
+#PBS -o /home/vitor/mapping/log/$PBS_JOBID.log.txt
+
+
+INDEX=/home/vitor/hlapers/1-make_indices/indices/star
+SAMPLE=`awk "FNR==$PBS_ARRAYID" /home/vitor/hlapers/map_to_genome/samples.txt`
+FQDIR=/home/vitor/hlaexpression/geuvadis_reanalysis/data/fastq
+MHCCOORDS=chr6:28722775-34129084
+GENCODE=/home/vitor/hlapers/1-make_indices/data/gencode/gencode.v25.MHC.IMGT.transcripts.fa
+OUTDIR=/home/vitor/mappings
+CPUS=$PBS_NUM_PPN 
 
 cd $PBS_O_WORKDIR
 
-mkdir -p ./log
+mkdir -p $OUTDIR/log
 
-SAMPLE=`awk "FNR==$PBS_ARRAYID" ../map_to_genome/samples.txt`
-
-./run_genotyping.sh $SAMPLE $PBS_NUM_PPN
+./run_genotyping.sh $INDEX $SAMPLE $FQDIR $MHCCOORDS $GENCODE $OUTDIR $CPUS   

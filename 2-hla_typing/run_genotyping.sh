@@ -1,20 +1,22 @@
 #!/bin/bash
 
-sample=$1
-CPUS=$2
+indexDIR=$1
+sample=$2
+fqDIR=$3
+mhccoords=$4
+gencode=$5
+outDIR=$6
+cpus=$7
 
-outPrefix=/scratch/genevol/users/vitor/mappings/${sample}_
+outPrefix=$outDIR/${sample}_
 bam=${outPrefix}Aligned.sortedByCoord.out.bam
-fq1=/home/vitor/hlaexpression/geuvadis_reanalysis/data/fastq/${sample}_1.fastq.gz
-fq2=/home/vitor/hlaexpression/geuvadis_reanalysis/data/fastq/${sample}_2.fastq.gz
-gencode=/home/vitor/hlapers/1-make_indices/data/gencode/gencode.v25.MHC.IMGT.transcripts.fa
+fq1=$fqDIR/${sample}_1.fastq.gz
+fq2=$fqDIR/${sample}_2.fastq.gz
 readsalign=${outPrefix}readsAligned.txt
 readsunmap=${outPrefix}readsUnmapped.txt
 readids=${outPrefix}readids.txt
-mhccoords=$(cat ../1-make_indices/mhc_coords.txt)
 fqmhc1=${outPrefix}mhc_1.fq
 fqmhc2=${outPrefix}mhc_2.fq
-indexDIR=/home/vitor/hlapers/1-make_indices/indices/star
 bammhcPrefix=${outPrefix}MHC_
 bammhc=${bammhcPrefix}Aligned.out.bam
 outmhc=${bammhcPrefix}quants
@@ -50,13 +52,14 @@ seqtk subseq $fq1 $readids > $fqmhc1
 seqtk subseq $fq2 $readids > $fqmhc2 
 
 # Remap to supplemented index
-STAR --runMode alignReads --runThreadN $CPUS --genomeDir $indexDIR\
+STAR --runMode alignReads --runThreadN $cpus --genomeDir $indexDIR\
     --readFilesIn $fqmhc1 $fqmhc2\
     --outFilterMismatchNmax 1\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
     --winAnchorMultimapNmax 6000\
     --alignEndsType EndToEnd\
+    --alignTranscriptsPerReadNmax 100000\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix $bammhcPrefix
@@ -66,7 +69,7 @@ if [ -d "$outmhc" ]; then
     rm -r $outmhc
 fi
 
-salmon quant -t $gencode -l IU -a $bammhc -o $outmhc -p $CPUS
+salmon quant -t $gencode -l IU -a $bammhc -o $outmhc -p $cpus
 
 #Extract up to top 5 HLA alleles
 if [ -d "$persindex" ]; then
@@ -83,7 +86,7 @@ Rscript write_genotyped_alleles.R $outtop5/top5_alleles.tsv $persfasta
 salmon index -t $persfasta -i $persindex/salmon --type quasi -k 31
 
 salmon quant -i $persindex/salmon -l IU -1 $fqmhc1 -2 $fqmhc2 -o $outtop5\
-    -p $CPUS --writeMappings > $outtop5/mappings.sam
+    -p $cpus --writeMappings > $outtop5/mappings.sam
 
 Rscript genotype_top5.R $outtop5/quant.sf $outtop5
 
@@ -108,12 +111,14 @@ seqtk subseq $fqmhc2 $readsNoWin > $fqnoWin2
 mkdir -p $outNoWin
 
 salmon quant -i $persindex/salmon -l IU -1 $fqnoWin1 -2 $fqnoWin2\
-    -o $outNoWin -p $CPUS
+    -o $outNoWin -p $cpus
 
 #Final gentotypes and personalized index
 Rscript final_genotype.R $outtop5/quant.sf $outNoWin/quant.sf ${outPrefix}genotypes.tsv 
 Rscript write_genotyped_alleles.R ${outPrefix}genotypes.tsv ${outPrefix}index.fa
 
+mv *MHC_Log* ./log/
+
 rm -r $readids $readsalign $readsunmap $fqmhc1 $fqmhc2 $bammhc $outmhc \
     ${bammhcPrefix}SJ.out.tab $persindex $outtop5 $readsWin $readsNoWin \
-    $fqnoWin1 $fqnoWin2 $outNoWin $bam $bam.bai
+    $fqnoWin1 $fqnoWin2 $outNoWin 
