@@ -17,9 +17,10 @@ imgt_genes <- imgt_loci %>%
     paste0("HLA-", .) %>%
     sort()
 
-annot <- gencode_chr_gene %>%
+annot <- gencode_all_gene %>%
     filter(gene_name %in% imgt_genes, 
-	   gene_type == "protein_coding" | grepl("transcribed", gene_type))
+	   gene_type == "protein_coding" | grepl("transcribed", gene_type)) %>%
+    distinct(gene_name, .keep_all = TRUE)
 
 pers_index_loci <- sort(annot$gene_name) %>% sub("HLA-", "", .)
 
@@ -27,6 +28,7 @@ hladb <- tibble(locus = pers_index_loci) %>%
     mutate(data = map(locus, ~hla_compile_index(., imgt_db))) %>%
     filter(!is.na(data)) %>%
     unnest(data) %>%
+    filter(!grepl("N$", allele)) %>%
     select(-locus) %>%
     mutate(allele = paste0("IMGT_", allele)) %>%
     split(.$allele) %>%
@@ -87,7 +89,7 @@ writeXStringSet(gencode_no_hla_uniq, "./data/gencode/gencode.v25.PRI.transcripts
 
 mhc_coords <- filtered_annots %>%
     filter(gene_name %in% hladb_genes) %>%
-    summarise(start = min(start) -1e6, end = max(end) + 1e6)
+    summarise(start = min(start) -5e5, end = max(end) + 5e5)
 
 mhc_coords %>%
     mutate(out = paste0("chr6:", start, "-", end)) %>%

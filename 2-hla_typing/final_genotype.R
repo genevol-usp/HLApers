@@ -24,7 +24,7 @@ typings_2nd <- quants_2nd %>%
 
 typings_df <- bind_rows(typings_1st, typings_2nd) %>%
     arrange(locus) %>%
-    hla_genotype(th = 0.01)
+    hla_genotype(th = 0.05)
 
 typings_df %>% 
     select(locus, allele) %>%

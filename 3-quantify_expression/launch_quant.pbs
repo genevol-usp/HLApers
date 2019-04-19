@@ -4,17 +4,14 @@
 #PBS -l mem=12gb
 #PBS -l walltime=24:00:00
 #PBS -q short
-#PBS -t 1-358
+#PBS -t 1
 #PBS -j oe
-#PBS -o ~/hlatx/4-quantify_expression/log/$PBS_JOBID.log
+#PBS -o /home/vitor/hlapers/3-quantify_expression/log/$PBS_JOBID.log
 
 cd $PBS_O_WORKDIR
 
 mkdir -p ./log
-mkdir -p ./sample_indices
-mkdir -p ./mappings
-mkdir -p ./quantifications
 
-SAMPLE=`awk "NR==$PBS_ARRAYID" ../data/sample_ids.txt`
+SAMPLE=`awk "NR==$PBS_ARRAYID" ../map_to_genome/samples.txt`
 
-./map_and_quantify.sh $SAMPLE
+./map_and_quantify.sh $SAMPLE $PBS_NUM_PPN

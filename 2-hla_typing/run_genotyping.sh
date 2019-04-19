@@ -17,9 +17,9 @@ readsunmap=${outPrefix}readsUnmapped.txt
 readids=${outPrefix}readids.txt
 fqmhc1=${outPrefix}mhc_1.fq
 fqmhc2=${outPrefix}mhc_2.fq
-bammhcPrefix=${outPrefix}MHC_
-bammhc=${bammhcPrefix}Aligned.out.bam
-outmhc=${bammhcPrefix}quants
+mhcPrefix=${outPrefix}MHC_
+bammhc=${mhcPrefix}Aligned.out.bam
+outmhc=${mhcPrefix}quants
 persindex=${outPrefix}persindex
 persfasta=$persindex/hla.fa
 outtop5=${outPrefix}top5_quants
@@ -31,27 +31,27 @@ fqnoWin1=${outPrefix}noWin_1.fq
 fqnoWin2=${outPrefix}noWin_2.fq
 outNoWin=${outPrefix}NoWin_quants
 
-# Extract MHC and Unmapped reads
-samtools index $bam $bam.bai
-
-samtools view $bam $mhccoords |\
-    cut -f1 |\
-    sort |\
-    uniq > $readsalign
-
-samtools view -F 0x2 $bam |\
-    cut -f1 |\
-    sort |\
-    uniq > $readsunmap
-
-cat $readsalign $readsunmap |\
-    sort |\
-    uniq > $readids
-
-seqtk subseq $fq1 $readids > $fqmhc1 
-seqtk subseq $fq2 $readids > $fqmhc2 
-
-# Remap to supplemented index
+## Extract MHC and Unmapped reads
+#samtools index $bam $bam.bai
+#
+#samtools view $bam $mhccoords |\
+#    cut -f1 |\
+#    sort |\
+#    uniq > $readsalign
+#
+#samtools view -F 0x2 $bam |\
+#    cut -f1 |\
+#    sort |\
+#    uniq > $readsunmap
+#
+#cat $readsalign $readsunmap |\
+#    sort |\
+#    uniq > $readids
+#
+#seqtk subseq $fq1 $readids > $fqmhc1 
+#seqtk subseq $fq2 $readids > $fqmhc2 
+#
+## Remap to supplemented index
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $indexDIR\
     --readFilesIn $fqmhc1 $fqmhc2\
     --outFilterMismatchNmax 1\
@@ -62,7 +62,7 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $indexDIR\
     --alignTranscriptsPerReadNmax 100000\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
-    --outFileNamePrefix $bammhcPrefix
+    --outFileNamePrefix $mhcPrefix
 
 # Quantify MHC expression
 if [ -d "$outmhc" ]; then
@@ -117,8 +117,14 @@ salmon quant -i $persindex/salmon -l IU -1 $fqnoWin1 -2 $fqnoWin2\
 Rscript final_genotype.R $outtop5/quant.sf $outNoWin/quant.sf ${outPrefix}genotypes.tsv 
 Rscript write_genotyped_alleles.R ${outPrefix}genotypes.tsv ${outPrefix}index.fa
 
-mv *MHC_Log* ./log/
+mv ${mhcPrefix}Log* $outDIR/log/ 
+mv $outmhc/logs/salmon_quant.log $outDIR/log/${sample}_salmon_quant_mhc.log
 
-rm -r $readids $readsalign $readsunmap $fqmhc1 $fqmhc2 $bammhc $outmhc \
-    ${bammhcPrefix}SJ.out.tab $persindex $outtop5 $readsWin $readsNoWin \
+#rm -r $readids $readsalign $readsunmap $fqmhc1 $fqmhc2 $bammhc $outmhc \
+#    ${mhcPrefix}SJ.out.tab $persindex $outtop5 $readsWin $readsNoWin \
+#    $fqnoWin1 $fqnoWin2 $outNoWin 
+#
+#
+rm -r $bammhc $outmhc\
+    ${mhcPrefix}SJ.out.tab $persindex $outtop5 $readsWin $readsNoWin \
     $fqnoWin1 $fqnoWin2 $outNoWin 

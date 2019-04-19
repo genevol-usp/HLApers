@@ -1,20 +1,19 @@
 #!/bin/bash
 
 #PBS -l nodes=1:ppn=8
-#PBS -l mem=16gb
+#PBS -l mem=36gb
 #PBS -l walltime=24:00:00
 #PBS -q short
-#PBS -t 1
+#PBS -t 1-358 
 #PBS -j oe
-#PBS -o /home/vitor/mapping/log/$PBS_JOBID.log.txt
+#PBS -o $HOME/mappings/log/$PBS_JOBID.log.txt
 
-
-INDEX=/home/vitor/hlapers/1-make_indices/indices/star
-SAMPLE=`awk "FNR==$PBS_ARRAYID" /home/vitor/hlapers/map_to_genome/samples.txt`
-FQDIR=/home/vitor/hlaexpression/geuvadis_reanalysis/data/fastq
-MHCCOORDS=chr6:28722775-34129084
-GENCODE=/home/vitor/hlapers/1-make_indices/data/gencode/gencode.v25.MHC.IMGT.transcripts.fa
-OUTDIR=/home/vitor/mappings
+INDEX=$HOME/hlapers/1-make_indices/indices/star
+SAMPLE=`awk "FNR==$PBS_ARRAYID" $HOME/hlapers/map_to_genome/samples.txt`
+FQDIR=$HOME/hlaexpression/geuvadis_reanalysis/data/fastq
+MHCCOORDS=chr6:29222775-33629084
+GENCODE=$HOME/hlapers/1-make_indices/data/gencode/gencode.v25.MHC.IMGT.transcripts.fa
+OUTDIR=$HOME/mappings
 CPUS=$PBS_NUM_PPN 
 
 cd $PBS_O_WORKDIR
