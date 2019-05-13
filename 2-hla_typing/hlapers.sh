@@ -1,24 +1,40 @@
-#/bin/bash
+#!/bin/bash
 
 usage() {
     echo "Usage: HLApers [options]"
     echo ""
-    echo "\t-h --help"
+    echo -e "\t-h | --help"
+    echo -e "\t-m | --module"
+    echo -e "\t-i | --index"
+    echo -e "\t-fq1"
+    echo -e "\t-fq2"
 }
 
-while [ "$1" != "" ]; do
-    PARAM=`echo $1 | awk -F= '{print $1}'`
-    VALUE=`echo $1 | awk -F= '{print $2}'`
-    case $PARAM in
-        -h | --help)
-            usage
-            exit
-            ;;
-        *)
-            echo "ERROR: unknown parameter ${$PARAM}"
-            usage
-            exit 1
-            ;;
+while [[ $# -gt 0 ]]
+do
+    key="$1"
+
+    case $key in
+    -h | --help)
+	usage
+	exit
+	;;
+    -m | --module)
+	module="$2"
+	shift 2
+	;;
+    -i | --index)
+	index="$2"
+	shift 2
+	;;
+    *)
+	echo "ERROR: unknown parameter $1"
+	usage
+	exit 1
+	;;
     esac
-    shift
 done
+
+
+
+

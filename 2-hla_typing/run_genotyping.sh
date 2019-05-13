@@ -31,27 +31,27 @@ fqnoWin1=${outPrefix}noWin_1.fq
 fqnoWin2=${outPrefix}noWin_2.fq
 outNoWin=${outPrefix}NoWin_quants
 
-## Extract MHC and Unmapped reads
-#samtools index $bam $bam.bai
-#
-#samtools view $bam $mhccoords |\
-#    cut -f1 |\
-#    sort |\
-#    uniq > $readsalign
-#
-#samtools view -F 0x2 $bam |\
-#    cut -f1 |\
-#    sort |\
-#    uniq > $readsunmap
-#
-#cat $readsalign $readsunmap |\
-#    sort |\
-#    uniq > $readids
-#
-#seqtk subseq $fq1 $readids > $fqmhc1 
-#seqtk subseq $fq2 $readids > $fqmhc2 
-#
-## Remap to supplemented index
+# Extract MHC and Unmapped reads
+samtools index $bam $bam.bai
+
+samtools view $bam $mhccoords |\
+    cut -f1 |\
+    sort |\
+    uniq > $readsalign
+
+samtools view -F 0x2 $bam |\
+    cut -f1 |\
+    sort |\
+    uniq > $readsunmap
+
+cat $readsalign $readsunmap |\
+    sort |\
+    uniq > $readids
+
+seqtk subseq $fq1 $readids > $fqmhc1 
+seqtk subseq $fq2 $readids > $fqmhc2 
+
+# Remap to supplemented index
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $indexDIR\
     --readFilesIn $fqmhc1 $fqmhc2\
     --outFilterMismatchNmax 1\

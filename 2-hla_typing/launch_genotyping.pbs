@@ -13,7 +13,7 @@ SAMPLE=`awk "FNR==$PBS_ARRAYID" $HOME/hlapers/map_to_genome/samples.txt`
 FQDIR=$HOME/hlaexpression/geuvadis_reanalysis/data/fastq
 MHCCOORDS=chr6:29222775-33629084
 GENCODE=$HOME/hlapers/1-make_indices/data/gencode/gencode.v25.MHC.IMGT.transcripts.fa
-OUTDIR=$HOME/mappings
+OUTDIR=/scratch/vitor/mappings
 CPUS=$PBS_NUM_PPN 
 
 cd $PBS_O_WORKDIR

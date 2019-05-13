@@ -2,8 +2,18 @@ suppressMessages(devtools::load_all("~/Libraries/hlaseqlib"))
 suppressPackageStartupMessages(library(Biostrings))
 suppressPackageStartupMessages(library(tidyverse))
 
-imgt_db <- "./data/IMGTHLA"
+###
+imgt_db <- "./IMGTHLA"
+hla_db <- "./hladb"
+gencode_annot <- "./gencode/gencode.v25.annotation.gtf.gz"
+###
 
+gencode_fasta <- commandArgs(TRUE)[1]
+gencode_annot <- commandArgs(TRUE)[2]
+imgt_db <- commandArgs(TRUE)[3]
+hla_db <- commandArgs(TRUE)[4]
+
+# HLA database
 imgt_loci <-
     file.path(imgt_db, "alignments") %>%
     list.files(pattern = "_nuc\\.txt") %>% 
@@ -17,12 +27,7 @@ imgt_genes <- imgt_loci %>%
     paste0("HLA-", .) %>%
     sort()
 
-annot <- gencode_all_gene %>%
-    filter(gene_name %in% imgt_genes, 
-	   gene_type == "protein_coding" | grepl("transcribed", gene_type)) %>%
-    distinct(gene_name, .keep_all = TRUE)
-
-pers_index_loci <- sort(annot$gene_name) %>% sub("HLA-", "", .)
+pers_index_loci <- sort(imgt_annot$gene_name) %>% sub("HLA-", "", .)
 
 hladb <- tibble(locus = pers_index_loci) %>%
     mutate(data = map(locus, ~hla_compile_index(., imgt_db))) %>%
@@ -35,32 +40,67 @@ hladb <- tibble(locus = pers_index_loci) %>%
     map_chr("cds") %>%
     DNAStringSet()
 
-writeXStringSet(hladb, "./data/hladb/hladb.fasta")
+writeXStringSet(hladb, file.path(hla_db, "hladb.fasta"))
+
+###
+hladb <- readDNAStringSet("./hladb/hladb.fasta")
+###
 
 hladb_genes <- unique(imgt_to_gname(names(hladb)))
 
-message("Processing Gencode annotations...")
+
+# Annotations
+imgt_annot <- file.path(hla_db, "imgt_gene_types.tsv") %>%
+    read_tsv() %>%
+    filter(gene_type == "protein_coding" | grepl("transcribed", gene_type))
+
+g_annot <-
+    read_tsv(gencode_annot, comment = "##", col_names = FALSE, 
+             col_types = "c-cii-c-c", progress = FALSE) 
+
+transc_annots <- g_annot %>%
+    filter(X3 == "transcript") %>%
+    select(X9) %>%
+    mutate(i = seq_len(nrow(.)), X9 = str_split(X9, "; ")) %>%
+    unnest() %>%
+    filter(grepl("^gene_name|^gene_id|^transcript_id|^transcript_type", X9)) %>%
+    separate(X9, c("tag", "id"), " ") %>%
+    mutate(id = gsub("\"", "", id)) %>%
+    spread(tag, id)
+
 tx_types_rm <- c("pseudogene", "processed_pseudogene", "unprocessed_pseudogene")
 
-filtered_annots <- gencode_pri_tx %>% filter(! tx_type %in% tx_types_rm)
+transc_annots_filter <- transc_annots %>% 
+    filter(! transcript_type %in% tx_types_rm)
 
-hla_tx <- "./data/gencode/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "exon") %>%
-    filter(gene_name %in% hladb_genes, tx_id %in% filtered_annots$tx_id) %>%
+hla_transc <- g_annot %>%
+    filter(X3 == "exon") %>%
+    select(chr = X1, start = X4, end = X5, X9) %>%
+    mutate(i = seq_len(nrow(.)), X9 = str_split(X9, "; ")) %>%
+    unnest() %>%
+    filter(grepl("^gene_name|^transcript_id|^transcript_type", X9)) %>%
+    separate(X9, c("tag", "id"), " ") %>%
+    mutate(id = gsub("\"", "", id)) %>%
+    spread(tag, id) %>%
+    filter(gene_name %in% hladb_genes, 
+	   transcript_id %in% transc_annots_filter$transcript_id) %>%
     mutate(pos = map2(start, end, `:`)) %>%
     unnest()
     
-hla_coding <- hla_tx %>%
-    filter(tx_type == "protein_coding")
+hla_coding <- hla_transc %>%
+    filter(transcript_type == "protein_coding")
 
-hla_noncoding <- hla_tx %>%
-    filter(tx_type != "protein_coding")
+hla_noncoding <- hla_transc %>%
+    filter(transcript_type != "protein_coding")
 
 hlatx_noncoding_keep <- hla_noncoding %>%
     group_by(tx_id) %>%
     filter(!any(pos %in% hla_coding$pos)) %>%
     distinct(gene_name, tx_id) %>%
     pull(tx_id)
+
+
+# Transcript sequences
 
 gencode <- readDNAStringSet("./data/gencode/gencode.v25.PRI.transcripts.fa") %>%
     .[filtered_annots$tx_id]
