@@ -12,7 +12,7 @@
     + Biostrings v2.44.0
 
 - R packages from GitHub:
-    + hlaseqlib v0.0.0.9000+ (https://github.com/genevol-usp/hlaseqlib) 
+    + hlaseqlib v0.0.0.9014+ (https://github.com/genevol-usp/hlaseqlib) 
     
 - RSEM (git clone https://github.com/deweylab/RSEM.git)
 
