@@ -1,10 +1,10 @@
-devtools::load_all("/home/vitor/Libraries/hlaseqlib")
 library(tidyverse)
 
 quant_file <- commandArgs(TRUE)[1]
 out <- commandArgs(TRUE)[2]
 
-hla_genes <- gencode_hla$gene_name 
+index <- "../1-make_indices/data/hladb/hladb.fasta" %>%
+    Biostrings::readDNAStringSet()
 
 imgt_quants <- read_tsv(quant_file) %>%
     filter(grepl("^IMGT", Name)) %>%
@@ -18,6 +18,8 @@ top_alleles <- imgt_quants %>%
     ungroup() %>%
     group_by(locus, lineage) %>%
     filter(tpm/max(tpm) > 0.25) %>%
-    ungroup()
+    ungroup() %>%
+    pull(allele) %>%
+    unique()
 
-write_tsv(top_alleles, out)
+Biostrings::writeXStringSet(index[top_alleles], out)
