@@ -74,6 +74,7 @@ HLApers is composed of the following modes:
     prepare-ref          Prepare transcript fasta files.
     index                Create index for read alignment.
     genotype             Infer HLA genotypes.
+    quant                Quantify HLA expression.
 
 ### 1. Building a transcriptome supplemented with HLA sequences
 
@@ -128,3 +129,7 @@ Example:
 Example:
 
     ./hlapers genotype -i index/STARMHC -t ./hladb/gencode_MHC_HLAsupp.fa -m hladb/mhc_coords.txt -b ERR188021.bam -p 8 -o results/ERR188021
+
+### 4. Quantify HLA expression
+
+...
