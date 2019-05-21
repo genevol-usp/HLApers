@@ -1,7 +1,8 @@
 library(tidyverse)
 
-top5_quants <- commandArgs(TRUE)[1]
-out <- commandArgs(TRUE)[2]
+opts <- commandArgs(TRUE)
+top5_quants <- opts[1]
+out         <- opts[2]
 
 quants <- top5_quants %>%
     read_tsv() %>%

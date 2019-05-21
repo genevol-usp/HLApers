@@ -1,15 +1,16 @@
-devtools::load_all("/home/vitor/Libraries/hlaseqlib")
-library(tidyverse)
+library(hlaseqlib)
+suppressPackageStartupMessages(library(tidyverse))
 
-quants_1st <- commandArgs(TRUE)[1]
-quants_2nd <- commandArgs(TRUE)[2]
-outPrefix <- commandArgs(TRUE)[3] 
+opts <- commandArgs(TRUE)
+gencode    <- opts[1]
+quants_1st <- opts[2]
+quants_2nd <- opts[3]
+outPrefix  <- opts[4] 
 
 outgenos <- paste0(outPrefix, "_genotypes.tsv")
 outindex <- paste0(outPrefix, "_index.fa")
 
-index <- "../1-make_indices/data/hladb/hladb.fasta" %>%
-    Biostrings::readDNAStringSet()
+index <- Biostrings::readDNAStringSet(gencode)
 
 typings_1st <- quants_1st %>% 
     read_tsv() %>%

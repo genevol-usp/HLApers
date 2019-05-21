@@ -127,4 +127,4 @@ Example:
 
 Example:
 
-    ./hlapers genotype -i index/STARMHC -t gencode.v25.transcripts.fa.gz -m hladb/mhc_coords.txt -b ERR188021.bam -p 8 -o results/ERR188021
+    ./hlapers genotype -i index/STARMHC -t ./hladb/gencode_MHC_HLAsupp.fa -m hladb/mhc_coords.txt -b ERR188021.bam -p 8 -o results/ERR188021

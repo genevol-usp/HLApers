@@ -1,10 +1,11 @@
 library(tidyverse)
 
-quant_file <- commandArgs(TRUE)[1]
-out <- commandArgs(TRUE)[2]
+opts <- commandArgs(TRUE)
+quant_file <- opts[1]
+gencode    <- opts[2]
+out        <- opts[3]
 
-index <- "../1-make_indices/data/hladb/hladb.fasta" %>%
-    Biostrings::readDNAStringSet()
+index <- Biostrings::readDNAStringSet(gencode)
 
 imgt_quants <- read_tsv(quant_file) %>%
     filter(grepl("^IMGT", Name)) %>%

@@ -73,54 +73,60 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_MHC_  
 
-## Quantify MHC expression
-#salmon quant -t $gencode -l IU -a $bammhc -o $outmhc -p $cpus
-#
+# Quantify MHC expression
+
+echo "Genotyping HLA..." 
+
+salmon quant -t $gencode -l A -a $bammhc -o $outmhc -p $cpus
+
 #Extract up to top 5 HLA alleles
-#mkdir -p $persindex
-#
-#Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $persindex/hla.fa
-#
-##Requantify expression of the top5
-#mkdir -p $outtop5
-#
-#salmon index -t $persindex/hla.fa -i $persindex/salmon --type quasi -k 31
-#
-#salmon quant -i $persindex/salmon -l IU -1 $samplefq1 -2 $samplefq2 -o $outtop5\
-#    -p $cpus --writeMappings > $outtop5/mappings.sam
-#
-#Rscript ./script/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
-#
-##Remove reads from the winner alleles
-#grep -v "^@" $outtop5/mappings.sam |\
-#    grep -F -f $outtop5/winners.txt - |\
-#    cut -f1 |\
-#    sort |\
-#    uniq > $readsWin
-#
-#grep -v "^@" $outtop5/mappings.sam|\
-#    cut -f1 |\
-#    awk 'FNR==NR {hash[$0]; next} !($0 in hash)' $readsWin - |\
-#    sort |\
-#    uniq > $readsNoWin
-#
-#seqtk subseq $samplefq1 $readsNoWin > $fqnoWin1
-#seqtk subseq $samplefq2 $readsNoWin > $fqnoWin2
-#
+mkdir -p $persindex
+
+Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $gencode $persindex/hla.fa
+
+#Requantify expression of the top5
+mkdir -p $outtop5
+
+salmon index -t $persindex/hla.fa -i $persindex/salmon --type quasi -k 31
+
+salmon quant -i $persindex/salmon -l A -1 $samplefq1 -2 $samplefq2 -o $outtop5\
+    -p $cpus --writeMappings > $outtop5/mappings.sam
+
+Rscript ./script/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
+
+#Remove reads from the winner alleles
+grep -i -v "^Version" $outtop5/mappings.sam |\
+    samtools view |\
+    grep -F -f $outtop5/winners.txt - |\
+    cut -f1 |\
+    sort |\
+    uniq > $readsWin
+
+grep -i -v "^Version" $outtop5/mappings.sam |\
+    samtools view |\
+    cut -f1 |\
+    awk 'FNR==NR {hash[$0]; next} !($0 in hash)' $readsWin - |\
+    sort |\
+    uniq > $readsNoWin
+
+seqtk subseq $samplefq1 $readsNoWin > $fqnoWin1
+seqtk subseq $samplefq2 $readsNoWin > $fqnoWin2
+
 #Requantify to see if winner alleles explain all the expression or if 
 # there is other relevant allele
-#
-#salmon quant -i $persindex/salmon -l IU -1 $fqnoWin1 -2 $fqnoWin2\
-#    -o $outNoWin -p $cpus
-#
-##Final gentotypes and personalized index
-#Rscript ./script/write_final_genotypes.R $outtop5/quant.sf $outNoWin/quant.sf ${outPrefix} 
-#
-#mkdir -p ${outPrefix}_logs
-#
-#mv ${outPrefix}_MHC_Log* ${outPrefix}_logs/
-#mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
-#
-#rm -r $samplefq1 $samplefq2 ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
-#    $readsNoWin $fqnoWin1 $fqnoWin2 $outNoWin 
-#
+
+salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
+    -o $outNoWin -p $cpus
+
+#Final gentotypes and personalized index
+Rscript ./script/write_final_genotypes.R $gencode $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
+
+mkdir -p ${outPrefix}_logs
+
+mv ${outPrefix}_MHC_Log* ${outPrefix}_logs/
+mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
+
+rm -r $samplefq1 $samplefq2 ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
+    $readsNoWin $fqnoWin1 $fqnoWin2 $outNoWin 
+
+echo "Done!" 
