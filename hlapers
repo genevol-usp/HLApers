@@ -7,6 +7,7 @@ usage() {
     printf "%-20s %s\n" "prepare-ref" "Prepare transcript fasta files."
     printf "%-20s %s\n" "index" "Create index for read alignment."
     printf "%-20s %s\n" "genotype" "Infer HLA genotypes."
+    printf "%-20s %s\n" "quant" "Quantify HLA expression."
 }
 
 usage_prepare() {
@@ -51,7 +52,7 @@ usage_quant() {
 # Mode functions
 run_prepref () {
     
-    if [ "$#" == 0 ]; then
+    if [ "$#" -eq 0 ]; then
 	usage_prepare
 	exit 1
     fi
@@ -92,7 +93,7 @@ run_prepref () {
 
 run_index() {
     
-    if [ "$#" == 0 ]; then
+    if [ "$#" -eq 0 ]; then
 	usage_index
 	exit 1
     fi
@@ -134,7 +135,7 @@ run_index() {
 
 run_genotype() {
 
-    if [ "$#" == 0 ]; then
+    if [ "$#" -eq 0 ]; then
         usage_genotype
         exit 1
     fi
@@ -181,7 +182,7 @@ run_genotype() {
 }
 
 run_quant() {
-    if [ "$#" == 0 ]; then
+    if [ "$#" -eq 0 ]; then
         usage_quant
         exit 1
     fi
@@ -225,7 +226,7 @@ run_quant() {
 
 
 # main
-if [ "$#" == 0 ]; then
+if [ "$#" -eq 0 ]; then
     usage
     exit 1
 fi
