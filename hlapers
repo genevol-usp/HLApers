@@ -1,0 +1,77 @@
+#!/bin/bash
+
+usage() {
+    echo "Usage: HLApers [modes]"
+    echo ""
+    printf "%-15s %s\n" "prepare-ref" "Prepare transcript fasta files."
+    printf "%-15s %s\n" "index" "Create index for STARsalmon or kallisto."
+    printf "%-15s %s\n" "quant" "Quantify expression with STARsalmon or kallisto pipelines."
+}
+
+usage_prepare() {
+    echo "Usage: HLApers prepare-ref [options]"
+    echo ""
+    printf "%-20s %s\n" "-t | --transcripts" "Fasta with Gencode transcript sequences."
+    printf "%-20s %s\n" "-a | --annotations" "GTF from Gencode for the same Genome version."
+    printf "%-20s %s\n" "-i | --imgt" "Path to IMGT directory."
+    printf "%-20s %s\n" "-o | --out" "hladb directory."
+}
+
+run_prepref () {
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        -h | --help)
+            usage_prepare
+            exit
+            ;;
+        -t | --transcripts)
+            transcripts="$2"
+            shift 2
+            ;;
+        -a | --annotations)
+            annotations="$2"
+            shift 2
+            ;;
+	-i | --imgt)
+	    imgt="$2"
+	    shift 2
+	    ;;
+	-o | -out)
+	    out="$2"
+	    shift 2
+	    ;;
+        *)
+            echo "ERROR: unknown parameter $1"
+            usage_prepare
+            exit 1
+            ;;
+        esac
+    done
+
+    Rscript ./script/make_index_files.R $transcripts $annotations $imgt $out
+}
+
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+    -h | --help)
+	usage
+	exit
+	;;
+    
+    prepare-ref)
+	shift
+	run_prepref "$@"
+	break
+	;;
+    
+    *)
+	echo "ERROR: unknown parameter $1"
+	usage
+	exit 1
+	;;
+    esac
+done
+
+
