@@ -1,117 +1,130 @@
-# Instructions
 
-## Install:
+HLApers
+=======
 
-- R v3.4+
+Getting started
+---------------
 
-- R packages from CRAN:
-    + devtools v1.13.0+
-    + tidyverse v1.1.1+
-    
-- R packages from Bioconductor:
-    + Biostrings v2.44.0
+### Install required software
 
-- R packages from GitHub:
-    + hlaseqlib v0.0.0.9000+ (https://github.com/genevol-usp/hlaseqlib) 
-    
-- RSEM (git clone https://github.com/deweylab/RSEM.git)
+##### 1. HLApers
 
-- STAR v2.5.3a+
+    git clone https://github.com/genevol-usp/HLApers.git
 
-- Salmon v0.8.2+
+##### 2. Install R v3.4+
 
-- samtools 1.3+
+##### 3. In R, install the following packages
 
+-   from CRAN:
 
-Notes:
+        install.packages(c("devtools", "tidyverse", "stringdist"))
 
-- The hlaseqlib R package is under active development. It can be installed with
-  the command devtools::install\_github("vitoraguiar/hlaseqlib") inside R. As an
-  alternative, in order to get the latest updates, we advise the user to clone
-  the repository and, instead of loading the package with the standard
-  "library()" function in R, use "devtools::load\_all(path\_to\_directory)".
+-   from Bioconductor:
 
-- Scripts assume that the executables or directories of the programs above are
-  in the home directory. Users must adjust the path in each script, or add the
-  programs to $PATH.
+<!-- -->
 
-## Download data:
+    if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
 
-*scripts assume IMGT repository cloned in home directory*
+    BiocManager::install("Biostrings")
 
-```
-git clone https://github.com/ANHIG/IMGTHLA.git
-```
+-   from GitHub:
 
-## The pipeline
+        devtools::install_github("genevol-usp/hlaseqlib")
 
-The pipeline is under development. We provide a mix of scripts to be
-submitted to a PBS qsub cluster, and scripts to be executed on the front end. 
+##### 4. For STAR-Salmon-based pipeline, install:
 
-The scripts are located on the directories where they are executed. Scripts are
-named according to the order of execution in each directory. When script names
-do not start with a number, the script is not meant to be executed by the user,
-but it is called by other scripts.
+-   STAR v2.5.3a+
 
-This may change in a near feature.
+-   Salmon v0.8.2+
 
+-   samtools 1.3+
 
-### Building a transcriptome supplemented with HLA sequences
+-   seqtk
 
-The first step is to build an index composed of Gencode v25 transcripts, where
-we replace the HLA transcripts with IMGT HLA allele sequences.
+##### 5. For kallisto-based pipeline, install:
 
-```
-cd ./1-make_indices
-```
+-   kallisto
 
-By executing 
+### Download data:
 
-```
-./0-download_data.sh
+##### 1. IMGT database
+
+    git clone https://github.com/ANHIG/IMGTHLA.git
+
+##### 2. Gencode:
+
+-   transcripts fasta (e.g., [Gencode v30 fasta](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.transcripts.fa.gz))
+
+-   corresponding annotations GTF (e.g., [Gencode v30 GTF](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.annotation.gtf.gz))
+
+HLApers usage
+-------------
+
+### Getting help
+
+HLApers is composed of the following modes:
+
+``` bash
+./hlapers --help
 ```
 
-we create the subdirecty "gencode", and download the annotations and Genome
-sequence for the primary assembly of the reference genome (GRCh38).
+    Usage: hlapers [modes]
 
-By executing the scripts numbered 1--9, we create the fasta and index files
-which will be used by the aligners.
+    prepare-ref          Prepare transcript fasta files.
+    index                Create index for read alignment.
+    genotype             Infer HLA genotypes.
 
+##### 1. Building a transcriptome supplemented with HLA sequences
 
-### Extract HLA reads from a standard alignment to the Genome
+The first step is to use `hlapers prepare-ref` to build an index composed of Gencode transcripts, where we replace the HLA transcripts with IMGT HLA allele sequences.
 
-Here we run a standard mapping to the reference genome, and extract the reads
-mapping to the MHC, and also those which are unmapped.
-
-If users already have a BAM file, it is possible to adapt the scripts to skip
-read mapping and proceed to the read extraction.
-
-Assuming that there is a directory ./data/fastq which contains the fastq files
-for all individuals, we can execute the mapping script
-
-```
-cd 2-map_to_genome
-qsub 1-map.pbs
+``` bash
+./hlapers prepare-ref --help
 ```
 
-### HLA typing
+    Usage: hlapers prepare-ref [options]
 
-Next, we move to the directory 3-hla\_typing
+    -t | --transcripts   Fasta with Gencode transcript sequences.
+    -a | --annotations   GTF from Gencode for the same Genome version.
+    -i | --imgt          Path to IMGT directory.
+    -o | --out           hladb directory.
 
-```
-cd 3-hla_typing
-```
+Example:
 
-and execute the scripts in the order which they are numbered to perform the HLA
-typing.
+    ./hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
 
-### Quantification
+##### 2. Creating an index for read alignment
 
-Finally, we estimate expression.
-
-```
-cd 4-quantify_expression
+``` bash
+./hlapers index --help
 ```
 
-Here we also execute the scripts in order.
+    Usage: hlapers index [options]
 
+    -t | --transcripts   Fasta with Gencode transcript sequences.
+    -p | --threads       Number of threads.
+    -o | --out           Output directory.
+
+Example:
+
+    ./hlapers index -t hladb/gencode_MHC_HLAsupp.fa -p 4 -o index
+
+##### 3. HLA genotyping
+
+``` bash
+./hlapers genotype --help
+```
+
+    Usage: hlapers genotype [options]
+
+    -i | --index         Index generated by 'hlapers index'.
+    -t | --transcripts   Fasta with Gencode transcripts sequences used for 'hlapers index'.
+    -m | --mhccoords     Genomics coordinates of the MHC region.
+    -b | --bam           BAM file with Genomic alignments.
+    -p | --threads       Number of threads.
+    -o | --outprefix     Output prefix name.
+
+Example:
+
+    ./hlapers genotype -i index/STARMHC -t gencode.v25.transcripts.fa.gz -m hladb/mhc_coords.txt -b ERR188021.bam -p 8 -o results/ERR188021
