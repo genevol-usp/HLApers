@@ -38,6 +38,15 @@ usage_genotype() {
     printf "%-20s %s\n" "-o | --outprefix" "Output prefix name."
 }
 
+usage_quant() {
+    echo "Usage: hlapers quant [options]"
+    echo ""
+    printf "%-20s %s\n" "-b | --bam" "BAM file."
+    printf "%-20s %s\n" "-t | --transcripts" "Reference transcripts directory."
+    printf "%-20s %s\n" "-f | --hlafasta" "Fasta with the individual's HLA sequences."
+    printf "%-20s %s\n" "-p | --threads" "Number of threads."
+    printf "%-20s %s\n" "-o | --out" "Output prefix name."
+}
 
 # Mode functions
 run_prepref () {
@@ -171,6 +180,49 @@ run_genotype() {
     ./script/run_genotyping.sh $bam $index $transcripts $hlacoords $outprefix $threads
 }
 
+run_quant() {
+    if [ "$#" == 0 ]; then
+        usage_quant
+        exit 1
+    fi
+
+    while [ "$#" -gt 0 ]; do
+	case "$1" in
+	    -h | --help)
+		usage_quant
+		exit
+		;;
+	    -b | --bam)
+		bam="$2"
+		shift 2
+		;;
+	    -t | --transcripts)
+		transcripts="$2"
+		shift 2
+		;;
+	    -f | --hlafasta)
+		hlafasta="$2"
+		shift 2
+		;;
+	    -p | --threads)
+		threads="$2"
+		shift 2
+		;;
+	    -o | --outprefix)
+		outprefix="$2"
+		shift 2
+		;;
+	    *)
+		echo "ERROR: unknown parameter $1"
+		usage_quant
+		exit 1
+		;;
+	esac
+    done
+
+    ./script/run_quant.sh $bam $transcripts $hlafasta $outprefix $threads
+}
+
 
 # main
 if [ "$#" == 0 ]; then
@@ -205,6 +257,12 @@ do
 	break
 	;;
 
+    quant)
+	shift
+	run_quant "$@"
+	break
+	;;
+
     *)
 	echo "ERROR: unknown parameter $1"
 	usage
@@ -212,5 +270,4 @@ do
 	;;
     esac
 done
-
 

@@ -11,7 +11,7 @@ Getting started
 
     git clone https://github.com/genevol-usp/HLApers.git
 
-##### 2. Install R v3.4+
+##### 2. R v3.4+
 
 ##### 3. In R, install the following packages
 
@@ -54,9 +54,9 @@ Getting started
 
 ##### 2. Gencode:
 
--   transcripts fasta (e.g., [Gencode v30 fasta](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.transcripts.fa.gz))
+-   transcripts fasta (e.g., [Gencode v30 fasta](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.transcripts.fa.gz) )
 
--   corresponding annotations GTF (e.g., [Gencode v30 GTF](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.annotation.gtf.gz))
+-   corresponding annotations GTF (e.g., [Gencode v30 GTF](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_30/gencode.v30.annotation.gtf.gz) )
 
 HLApers usage
 -------------
@@ -75,7 +75,7 @@ HLApers is composed of the following modes:
     index                Create index for read alignment.
     genotype             Infer HLA genotypes.
 
-##### 1. Building a transcriptome supplemented with HLA sequences
+### 1. Building a transcriptome supplemented with HLA sequences
 
 The first step is to use `hlapers prepare-ref` to build an index composed of Gencode transcripts, where we replace the HLA transcripts with IMGT HLA allele sequences.
 
@@ -94,7 +94,7 @@ Example:
 
     ./hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
 
-##### 2. Creating an index for read alignment
+### 2. Creating an index for read alignment
 
 ``` bash
 ./hlapers index --help
@@ -110,7 +110,7 @@ Example:
 
     ./hlapers index -t hladb/gencode_MHC_HLAsupp.fa -p 4 -o index
 
-##### 3. HLA genotyping
+### 3. HLA genotyping
 
 ``` bash
 ./hlapers genotype --help
