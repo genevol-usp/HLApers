@@ -1,15 +1,16 @@
 #!/bin/bash
 
+# Usage functions
 usage() {
-    echo "Usage: HLApers [modes]"
+    echo "Usage: hlapers [modes]"
     echo ""
-    printf "%-15s %s\n" "prepare-ref" "Prepare transcript fasta files."
-    printf "%-15s %s\n" "index" "Create index for STARsalmon or kallisto."
-    printf "%-15s %s\n" "quant" "Quantify expression with STARsalmon or kallisto pipelines."
+    printf "%-20s %s\n" "prepare-ref" "Prepare transcript fasta files."
+    printf "%-20s %s\n" "index" "Create index for STARsalmon or kallisto."
+    printf "%-20s %s\n" "quant" "Quantify expression with STARsalmon or kallisto pipelines."
 }
 
 usage_prepare() {
-    echo "Usage: HLApers prepare-ref [options]"
+    echo "Usage: hlapers prepare-ref [options]"
     echo ""
     printf "%-20s %s\n" "-t | --transcripts" "Fasta with Gencode transcript sequences."
     printf "%-20s %s\n" "-a | --annotations" "GTF from Gencode for the same Genome version."
@@ -17,6 +18,16 @@ usage_prepare() {
     printf "%-20s %s\n" "-o | --out" "hladb directory."
 }
 
+usage_index() {
+    echo "Usage: hlapers index [options]"
+    echo ""
+    printf "%-20s %s\n" "-t | --transcripts" "Fasta with Gencode transcript sequences."
+    printf "%-20s %s\n" "-p | --threads" "Number of threads"
+    printf "%-20s %s\n" "-o | --out" "Output directory"
+}
+
+
+# Mode functions
 run_prepref () {
     while [ "$#" -gt 0 ]; do
         case "$1" in
@@ -52,6 +63,43 @@ run_prepref () {
 }
 
 
+run_index() {
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        -h | --help)
+            usage_index
+            exit
+            ;;
+	-t | --transcripts)
+	    transcripts="$2"
+	    shift 2
+	    ;;
+	-p | --threads)
+	    threads="$2"
+	    shift 2
+	    ;;
+	-o | --out)
+	    out="$2"
+	    shift 2
+	    ;;
+        *)
+            echo "ERROR: unknown parameter $1"
+            usage_index
+            exit 1
+            ;;
+        esac
+    done
+    
+    mkdir -p $out
+    mkdir -p $out/STARMHC
+    mkdir -p $out/SalmonMHC
+
+    STAR --runThreadN $threads --runMode GenomeGenerate --genomeDir $out/STARMHC \
+	--genomeFastaFiles $transcripts --genomeChrBinNbits 10 --genomeSAindexNbases 11
+
+}
+
+
 while [[ $# -gt 0 ]]
 do
     case "$1" in
@@ -65,7 +113,13 @@ do
 	run_prepref "$@"
 	break
 	;;
-    
+
+    index)
+	shift
+	run_index "$@"
+	break
+	;;
+
     *)
 	echo "ERROR: unknown parameter $1"
 	usage
