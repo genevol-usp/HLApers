@@ -132,4 +132,18 @@ Example:
 
 ### 4. Quantify HLA expression
 
-...
+``` bash
+./hlapers quant --help
+```
+
+    Usage: hlapers quant [options]
+
+    -b | --bam           BAM file.
+    -t | --transcripts   Reference transcripts directory.
+    -f | --hlafasta      Fasta with the individual's HLA sequences.
+    -p | --threads       Number of threads.
+    -o | --out           Output prefix name.
+
+Example:
+
+    ./hlapers quant -b ERR188021.bam -t ./hladb -f ./results/ERR188482_index.fa -o ./results/ERR188482 -p 8
