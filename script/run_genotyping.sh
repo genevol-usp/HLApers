@@ -1,23 +1,12 @@
 #!/bin/bash
 
-bam=$1
-index=$2
-gencode=$3
-mhccoords=$4
+index=$1
+gencode=$2
+fq1=$3
+fq2=$4
 outPrefix=$5
 cpus=$6
 
-mhc=$(cat $mhccoords)
-
-#bam to fastq
-mhcfq1=${outPrefix}_mhc_1.fq 
-mhcfq2=${outPrefix}_mhc_2.fq 
-unmapfq1=${outPrefix}_unmap_1.fq
-unmapfq2=${outPrefix}_unmap_2.fq
-samplefq1=${outPrefix}_1.fq
-samplefq2=${outPrefix}_2.fq
-
-# remapping
 bammhc=${outPrefix}_MHC_Aligned.out.bam
 outmhc=${outPrefix}_MHC_quants
 persindex=${outPrefix}_persindex
@@ -28,41 +17,12 @@ fqnoWin1=${outPrefix}_noWin_1.fq
 fqnoWin2=${outPrefix}_noWin_2.fq
 outNoWin=${outPrefix}_NoWin_quants
 
-# Extract MHC reads
-
-echo "Extracting MHC and unmapped reads from BAM..."
-
-if [ ! -f "$bam".bai ]; then
-    samtools index $bam $bam.bai
-fi
-
-samtools view $bam $mhc -b |\
-    samtools sort -n - |\
-    samtools fastq -1 $mhcfq1 -2 $mhcfq2 -
-
-samtools view -F 0x2 $bam |\
-    samtools sort -n - |\
-    samtools fastq -1 $unmapfq1 -2 $unmapfq2 -
-
-cat $mhcfq1 $unmapfq1 > $samplefq1.tmp
-cat $mhcfq2 $unmapfq2 > $samplefq2.tmp
-
-comm -12 <(sed -n '1~4p' $samplefq1.tmp | sort) <(sed -n '1~4p' $samplefq2.tmp | sort) |\
-    sed 's|^@||' |\
-    sort -V |\
-    uniq > ${outPrefix}_reads
-
-seqtk subseq $samplefq1.tmp ${outPrefix}_reads > $samplefq1
-seqtk subseq $samplefq2.tmp ${outPrefix}_reads > $samplefq2
-
-rm $mhcfq1 $mhcfq2 $unmapfq1 $unmapfq2 $samplefq1.tmp $samplefq2.tmp ${outPrefix}_reads
-
 # Remap to supplemented index
 
 echo "Remapping extracted reads to personalized MHC index..."
 
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
-    --readFilesIn $samplefq1 $samplefq2\
+    --readFilesIn $fq1 $fq2\
     --outFilterMismatchNmax 1\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
@@ -89,7 +49,7 @@ mkdir -p $outtop5
 
 salmon index -t $persindex/hla.fa -i $persindex/salmon --type quasi -k 31
 
-salmon quant -i $persindex/salmon -l A -1 $samplefq1 -2 $samplefq2 -o $outtop5\
+salmon quant -i $persindex/salmon -l A -1 $fq1 -2 $fq2 -o $outtop5\
     -p $cpus --writeMappings > $outtop5/mappings.sam
 
 Rscript ./script/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
@@ -109,8 +69,8 @@ grep -i -v "^Version" $outtop5/mappings.sam |\
     sort |\
     uniq > $readsNoWin
 
-seqtk subseq $samplefq1 $readsNoWin > $fqnoWin1
-seqtk subseq $samplefq2 $readsNoWin > $fqnoWin2
+seqtk subseq $fq1 $readsNoWin > $fqnoWin1
+seqtk subseq $fq2 $readsNoWin > $fqnoWin2
 
 #Requantify to see if winner alleles explain all the expression or if 
 # there is other relevant allele
@@ -126,7 +86,7 @@ mkdir -p ${outPrefix}_logs
 mv ${outPrefix}_MHC_Log* ${outPrefix}_logs/
 mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
 
-rm -r $samplefq1 $samplefq2 ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
+rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
     $readsNoWin $fqnoWin1 $fqnoWin2 $outNoWin 
 
 echo "Done!" 

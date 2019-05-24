@@ -1,21 +1,17 @@
 #!/bin/bash
 
-bam=$1
-hladb=$2
-samplehla=$3
-outPrefix=$4
-cpus=$5
+hladb=$1
+samplehla=$2
+fq1=$3
+fq2=$4
+outPrefix=$5
+cpus=$6
 
 gencodeNoHLA=$hladb/gencode_noHLA.fa
 index=${outPrefix}_index
 sample_gencode=${outPrefix}_gencode.fa
-fq1=${outPrefix}_1.fq.gz
-fq2=${outPrefix}_2.fq.gz
 bampers=${outPrefix}_Aligned.out.bam
 out=${outPrefix}_quant
-
-samtools sort -n $bam |\
-    samtools fastq -N -1 $fq1 -2 $fq2 -
 
 mkdir -p $index
 
@@ -45,4 +41,4 @@ salmon quant -t $sample_gencode -l A -a $bampers -o $out -p $cpus \
 
 mv ${outPrefix}_*Log.* ${outPrefix}_logs/
 
-rm -r $bampers $fq1 $fq2 $index $sample_gencode ${outPrefix}_SJ* 
+rm -r $bampers $index $sample_gencode ${outPrefix}_SJ* 
