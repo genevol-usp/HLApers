@@ -159,8 +159,6 @@ Example:
 
 Proceed to the quantification step.
 
-Example:
-
 ``` bash
 ./hlapers quant --help
 ```
