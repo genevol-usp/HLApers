@@ -120,14 +120,11 @@ Given a BAM file from a previous alignment to the genome, we first need to extra
 ./hlapers bam2fq --help
 ```
 
-    Usage: hlapers quant [options]
+    Usage: hlapers bam2fq [options]
 
-    -t | --transcripts   Reference transcripts directory.
-    -f | --hlafasta      Fasta with the individual's HLA sequences.
-    -1 | --fq1           Fastq for READ 1 sorted by read id.
-    -2 | --fq2           Fastq for READ 2 sorted by read id.
-    -p | --threads       Number of threads.
-    -o | --out           Output prefix name.
+    -m | --mhc-coords    Genomic coordinates of the MHC region in chrN:start-end format if MHC fastq is desired.
+    -b | --bam           BAM file.
+    -o | --outprefix     Output prefix name.
 
 Example:
 
