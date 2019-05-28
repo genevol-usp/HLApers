@@ -240,7 +240,7 @@ run_bam2fq() {
     while [[ "$#" -gt 0 ]]; do
 	case "$1" in
 	    -h|--help)
-		usage_quant
+		usage_bam2fq
 		exit
 		;;
 	    -b|--bam)
