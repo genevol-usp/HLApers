@@ -6,7 +6,6 @@ outPrefix=$3
 
 mhc=$(cat $mhccoords)
 
-#bam to fastq
 mapfq1=${outPrefix}_map_1.fq 
 mapfq2=${outPrefix}_map_2.fq 
 unmapfq1=${outPrefix}_unmap_1.fq
