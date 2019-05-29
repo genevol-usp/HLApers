@@ -25,6 +25,7 @@ usage_index() {
     echo ""
     printf "%-20s %s\n" "-t | --transcripts" "Fasta with Gencode transcript sequences."
     printf "%-20s %s\n" "-p | --threads" "Number of threads."
+    printf "%-20s %s\n" "--kallisto" "Create index for kallisto pipeline instead of STARsalmon."
     printf "%-20s %s\n" "-o | --out" "Output directory."
 }
 
@@ -37,6 +38,7 @@ usage_genotype() {
     printf "%-20s %s\n" "-2 | --fq2" "MHC Fastq for READ 2 sorted by read id."
     printf "%-20s %s\n" "-p | --threads" "Number of threads."
     printf "%-20s %s\n" "-o | --outprefix" "Output prefix name."
+    printf "%-20s %s\n" "--kallisto" "Use kallisto for genotyping."
 }
 
 usage_quant() {
@@ -125,6 +127,10 @@ run_index() {
 	    out="$2"
 	    shift 2
 	    ;;
+	--kallisto)
+	    kallisto=1
+	    shift
+	    ;;
         *)
             echo "ERROR: unknown parameter $1"
             usage_index
@@ -132,8 +138,16 @@ run_index() {
             ;;
         esac
     done
-    
-    ./script/run_starindex.sh $transcripts $out $threads
+   
+    if [[ -z "$kallisto" ]]; then
+
+	./script/run_starindex.sh $transcripts $out $threads
+
+    elif [[ "$kallisto" == 1 ]]; then
+	
+	./script/run_kallistoindex.sh $transcripts $out
+
+    fi
 }
 
 run_genotype() {
@@ -173,6 +187,10 @@ run_genotype() {
 		outprefix="$2"
 		shift 2
 		;;
+	    --kallisto)
+		kallisto=1
+		shift
+		;;
 	    *)
 		echo "ERROR: unknown parameter $1"
 		usage_genotype
@@ -180,8 +198,17 @@ run_genotype() {
 		;;
 	esac
     done
+    
+    if [[ -z "$kallisto" ]]; then
 
-    ./script/run_genotyping.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+	./script/run_genotyping.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+
+    elif [[ "$kallisto" == 1 ]]; then
+
+	./script/run_genotypingkallisto.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+
+    fi
+
 }
 
 run_quant() {

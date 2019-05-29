@@ -27,8 +27,8 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
     --winAnchorMultimapNmax 6000\
-    --alignEndsType EndToEnd\
     --alignTranscriptsPerReadNmax 100000\
+    --alignEndsType EndToEnd\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_MHC_  
@@ -69,8 +69,20 @@ grep -i -v "^Version" $outtop5/mappings.sam |\
     sort |\
     uniq > $readsNoWin
 
-seqtk subseq $fq1 $readsNoWin > $fqnoWin1
-seqtk subseq $fq2 $readsNoWin > $fqnoWin2
+if [[ $(head -n1 $fq1) =~ /1$ ]] && [[ $(head -n1 $fq2) =~ /2$ ]]; then
+
+    awk '{ print $0 "/1" }' $readsNoWin > ${readsNoWin}1
+    awk '{ print $0 "/2" }' $readsNoWin > ${readsNoWin}2
+
+    seqtk subseq $fq1 ${readsNoWin}1 > $fqnoWin1
+    seqtk subseq $fq2 ${readsNoWin}2 > $fqnoWin2
+
+else
+
+    seqtk subseq $fq1 $readsNoWin > $fqnoWin1
+    seqtk subseq $fq2 $readsNoWin > $fqnoWin2
+
+fi
 
 #Requantify to see if winner alleles explain all the expression or if 
 # there is other relevant allele
@@ -87,6 +99,6 @@ mv ${outPrefix}_MHC_Log* ${outPrefix}_logs/
 mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
 
 rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
-    $readsNoWin $fqnoWin1 $fqnoWin2 $outNoWin 
+    ${readsNoWin}* $fqnoWin1 $fqnoWin2 $outNoWin 
 
 echo "Done!" 

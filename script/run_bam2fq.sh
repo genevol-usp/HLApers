@@ -11,5 +11,5 @@ if [[ ! -f "$bam".bai ]]; then
 fi
 
 samtools sort -n $bam |\
-    samtools fastq -N -1 $fq1 -2 $fq2 -
+    samtools fastq -N -1 $fq1 -2 $fq2 -0 /dev/null -
 

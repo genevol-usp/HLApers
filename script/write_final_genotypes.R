@@ -2,7 +2,7 @@ library(hlaseqlib)
 suppressPackageStartupMessages(library(tidyverse))
 
 opts <- commandArgs(TRUE)
-gencode    <- opts[1]
+transcripts<- opts[1]
 quants_1st <- opts[2]
 quants_2nd <- opts[3]
 outPrefix  <- opts[4] 
@@ -10,7 +10,7 @@ outPrefix  <- opts[4]
 outgenos <- paste0(outPrefix, "_genotypes.tsv")
 outindex <- paste0(outPrefix, "_index.fa")
 
-index <- Biostrings::readDNAStringSet(gencode)
+index <- Biostrings::readDNAStringSet(transcripts)
 
 typings_1st <- quants_1st %>% 
     read_tsv() %>%
