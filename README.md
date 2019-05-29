@@ -106,6 +106,7 @@ Example:
 
     -t | --transcripts   Fasta with Gencode transcript sequences.
     -p | --threads       Number of threads.
+    --kallisto           Create index for kallisto pipeline instead of STARsalmon.
     -o | --out           Output directory.
 
 Example:
@@ -144,6 +145,7 @@ Then we run the genotyping module.
     -2 | --fq2           MHC Fastq for READ 2 sorted by read id.
     -p | --threads       Number of threads.
     -o | --outprefix     Output prefix name.
+    --kallisto           Use kallisto for genotyping.
 
 Example:
 
