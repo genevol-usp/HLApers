@@ -1,4 +1,4 @@
-suppressMessages(library(hlaseqlib))
+library(hlaseqlib)
 suppressPackageStartupMessages(library(Biostrings))
 suppressPackageStartupMessages(library(tidyverse))
 
@@ -28,7 +28,7 @@ imgt_genes <- imgt_loci %>%
     paste0("HLA-", .) %>%
     sort()
 
-imgt_annot <- file.path(out, "imgt_gene_types.tsv") %>%
+imgt_annot <- "./data/imgt_gene_types.tsv" %>%
     read_tsv(col_types = "cc") %>%
     filter(gene_type == "protein_coding" | grepl("transcribed", gene_type))
 
@@ -46,7 +46,6 @@ hladb <- tibble(locus = pers_index_loci) %>%
     DNAStringSet()
 
 hladb_genes <- unique(sub("^IMGT_([^\\*]+).+$", "HLA-\\1", names(hladb)))
-
 
 # Annotations
 message("Processing Gencode annotations...")
@@ -74,7 +73,7 @@ mhc_coords <- transc_annots %>%
 mhc_coords %>%
     mutate(out = paste0("chr6:", start, "-", end)) %>%
     pull(out) %>%
-    writeLines(file.path(out, "mhc_coords.txt"))
+    writeLines("./data/mhc_coords.txt")
 
 
 # Transcript sequences

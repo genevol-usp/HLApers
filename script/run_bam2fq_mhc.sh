@@ -32,8 +32,8 @@ samtools view -F 0x2 $bam -b |\
     samtools sort -n - |\
     samtools fastq -1 $unmapfq1 -2 $unmapfq2 -0 /dev/null -
 
-cat $mapfq1 $unmapfq1 > $mhcfq1.tmp
-cat $mapfq2 $unmapfq2 > $mhcfq2.tmp
+cat $mapfq1 $unmapfq1 | sort | uniq > $mhcfq1.tmp
+cat $mapfq2 $unmapfq2 | sort | uniq > $mhcfq2.tmp
 
 sed -n '1~4p' $mhcfq1.tmp | sed 's|^@||' | sort > $reads1tmp
 sed -n '1~4p' $mhcfq2.tmp | sed 's|^@||' | sort > $reads2tmp

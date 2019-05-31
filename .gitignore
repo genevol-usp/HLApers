@@ -1,2 +1,9 @@
-1-index_preparation/gencode
-1-index_preparation/imgt_index.fa
+*.tsv
+*.txt
+*.pbs
+index
+fastq
+gencode
+IMGTHLA
+results*
+

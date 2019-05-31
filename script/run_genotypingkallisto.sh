@@ -9,4 +9,4 @@ cpus=$6
 
 kallisto quant -i $index -t $cpus -o $out $fq1 $fq2
 
-Rscript genotype_kallisto.R $transcripts $out
+Rscript ./script/genotype_kallisto.R $transcripts $out
