@@ -90,7 +90,7 @@ The first step is to use `hlapers prepare-ref` to build an index composed of Gen
     -t | --transcripts   Fasta with Gencode transcript sequences.
     -a | --annotations   GTF from Gencode for the same Genome version.
     -i | --imgt          Path to IMGT directory.
-    -o | --out           hladb directory.
+    -o | --out           Output directory.
 
 Example:
 
