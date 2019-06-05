@@ -1,4 +1,4 @@
-library(tidyverse)
+supressPackageStartupMessages(library(tidyverse))
 
 opts <- commandArgs(TRUE)
 top5_quants <- opts[1]
