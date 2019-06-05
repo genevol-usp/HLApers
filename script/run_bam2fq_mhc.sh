@@ -6,17 +6,18 @@ outPrefix=$3
 
 mhc=$(cat $mhccoords)
 
-mapfq1=${outPrefix}_map_1.fq 
-mapfq2=${outPrefix}_map_2.fq 
-unmapfq1=${outPrefix}_unmap_1.fq
-unmapfq2=${outPrefix}_unmap_2.fq
-mhcfq1=${outPrefix}_mhc_1.fq
-mhcfq2=${outPrefix}_mhc_2.fq
+mapbam=${outPrefix}_map.bam 
+unmapbam=${outPrefix}_unmap.bam
+tmpbam=${outPrefix}_tmp.bam
+tmpfq1=${outPrefix}_tmp_1.fq
+tmpfq2=${outPrefix}_tmp_2.fq
 reads1tmp=${outPrefix}_reads1.tmp
 reads2tmp=${outPrefix}_reads2.tmp
+reads=${outPrefix}_reads
 reads1=${outPrefix}_reads1
 reads2=${outPrefix}_reads2
-reads=${outPrefix}_reads
+finalfq1=${outPrefix}_mhc_unmap_1.fq
+finalfq2=${outPrefix}_mhc_unmap_2.fq
 
 echo "Extracting MHC and unmapped reads from BAM..."
 
@@ -24,34 +25,23 @@ if [[ ! -f "$bam".bai ]]; then
     samtools index $bam $bam.bai
 fi
 
-samtools view $bam $mhc -b |\
-    samtools sort -n - |\
-    samtools fastq -1 $mapfq1 -2 $mapfq2 -0 /dev/null -
+samtools view $bam $mhc -b -o $mapbam
+samtools view -F 0x2 $bam -b -o $unmapbam
+samtools merge $tmpbam $mapbam $unmapbam 
 
-samtools view -F 0x2 $bam -b |\
-    samtools sort -n - |\
-    samtools fastq -1 $unmapfq1 -2 $unmapfq2 -0 /dev/null -
+samtools sort -n $tmpbam | samtools fastq -1 $tmpfq1 -2 $tmpfq2 -0 /dev/null -
 
-cat $mapfq1 $unmapfq1 | sort | uniq > $mhcfq1.tmp
-cat $mapfq2 $unmapfq2 | sort | uniq > $mhcfq2.tmp
+sed -n '1~4p' $tmpfq1 | sed 's|^@||' | sed 's|/1$||'| sort > $reads1tmp
+sed -n '1~4p' $tmpfq2 | sed 's|^@||' | sed 's|/2$||'| sort > $reads2tmp
 
-sed -n '1~4p' $mhcfq1.tmp | sed 's|^@||' | sort > $reads1tmp
-sed -n '1~4p' $mhcfq2.tmp | sed 's|^@||' | sort > $reads2tmp
+comm -12 $reads1tmp $reads2tmp | sort -V | uniq > $reads
 
-if [[ $(head -n1 $reads1tmp) =~ /1$ ]] && [[ $(head -n1 $reads2tmp) =~ /2$ ]]; then
-
-    comm -12 <(sed 's|/1$||' $reads1tmp | sort) <(sed 's|/2$||' $reads2tmp | sort) |\
-	sort -V |\
-	uniq > $reads
+if [[ $(head -n1 $tmpfq1) =~ /1$ ]] && [[ $(head -n1 $tmpfq2) =~ /2$ ]]; then
 
     awk '{ print $0 "/1" }' $reads > $reads1
     awk '{ print $0 "/2" }' $reads > $reads2
 
 else
-
-    comm -12 <(sort $read1tmp) <(sort $reads2tmp) |\
-	sort -V |\
-	uniq > $reads
 
     cp $reads $reads1
     cp $reads $reads2
@@ -60,10 +50,9 @@ fi
 
 echo "Writing fastq files..."
 
-seqtk subseq $mhcfq1.tmp $reads1 > $mhcfq1
-seqtk subseq $mhcfq2.tmp $reads2 > $mhcfq2
+seqtk subseq $tmpfq1 $reads1 > $finalfq1
+seqtk subseq $tmpfq2 $reads2 > $finalfq2
 
-rm $mapfq1 $mapfq2 $unmapfq1 $unmapfq2 $mhcfq1.tmp $mhcfq2.tmp\
-    $reads1tmp $reads2tmp $reads1 $reads2 $reads
+rm $mapbam $unmapbam $tmpbam $tmpfq1 $tmpfq2 $reads1tmp $reads2tmp $reads $reads1 $reads2
 
 echo "Done!"
