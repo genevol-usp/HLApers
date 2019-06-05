@@ -18,7 +18,6 @@ fqnoWin2=${outPrefix}_noWin_2.fq
 outNoWin=${outPrefix}_NoWin_quants
 
 # Remap to supplemented index
-
 echo "Remapping extracted reads to personalized MHC index..."
 
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
@@ -34,7 +33,6 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outFileNamePrefix ${outPrefix}_MHC_  
 
 # Quantify MHC expression
-
 echo "Genotyping HLA..." 
 
 salmon quant -t $gencode -l A -a $bammhc -o $outmhc -p $cpus
@@ -50,20 +48,18 @@ mkdir -p $outtop5
 salmon index -t $persindex/hla.fa -i $persindex/salmon --type quasi -k 31
 
 salmon quant -i $persindex/salmon -l A -1 $fq1 -2 $fq2 -o $outtop5\
-    -p $cpus --writeMappings > $outtop5/mappings.sam
+    -p $cpus --writeMappings=$outtop5/mappings.sam
 
 Rscript ./script/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
 
 #Remove reads from the winner alleles
-grep -i -v "^Version" $outtop5/mappings.sam |\
-    samtools view |\
+samtools view $outtop5/mappings.sam |\
     grep -F -f $outtop5/winners.txt - |\
     cut -f1 |\
     sort |\
     uniq > $readsWin
 
-grep -i -v "^Version" $outtop5/mappings.sam |\
-    samtools view |\
+samtools view $outtop5/mappings.sam |\
     cut -f1 |\
     awk 'FNR==NR {hash[$0]; next} !($0 in hash)' $readsWin - |\
     sort |\
