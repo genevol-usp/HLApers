@@ -38,6 +38,9 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
 salmon quant -t $sample_gencode -l A -a $bampers -o $out -p $cpus \
     --seqBias --gcBias --posBias
 
+awk 'FNR == 1 {print $1"\t"$4"\t"$5}' $out/quant.sf > ${outPrefix}_hlaquant.tsv
+awk '/IMGT/ {print $1"\t"$4"\t"$5}' $out/quant.sf >> ${outPrefix}_hlaquant.tsv
+
 mv ${outPrefix}_*Log.* ${outPrefix}_logs/
 
 rm -r $bampers $index $sample_gencode ${outPrefix}_SJ* 
