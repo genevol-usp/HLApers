@@ -31,7 +31,6 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --winAnchorMultimapNmax 300\
     --alignIntronMax 0\
     --alignEndsType Local\
-    --outSAMunmapped Within KeepPairs\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_
