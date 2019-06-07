@@ -7,18 +7,18 @@ fq2=$4
 outPrefix=$5
 cpus=$6
 
-gencodeNoHLA=$hladb/gencode_noHLA.fa
+transcriptsNoHLA=$hladb/gencode_noHLA.fa
 index=${outPrefix}_index
-sample_gencode=${outPrefix}_gencode.fa
+sample_transcripts=${outPrefix}_transcripts.fa
 bampers=${outPrefix}_Aligned.out.bam
 out=${outPrefix}_quant
 
 mkdir -p $index
 
-cat $gencodeNoHLA $samplehla > $sample_gencode
+cat $transcriptsNoHLA $samplehla > $sample_transcripts
 
 STAR --runThreadN $cpus --runMode genomeGenerate --genomeDir $index\
-    --genomeFastaFiles $sample_gencode\
+    --genomeFastaFiles $sample_transcripts\
     --genomeChrBinNbits 11 --genomeSAindexNbases 13\
     --outFileNamePrefix ${index}_
 
@@ -35,7 +35,7 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_
 
-salmon quant -t $sample_gencode -l A -a $bampers -o $out -p $cpus \
+salmon quant -t $sample_transcripts -l A -a $bampers -o $out -p $cpus \
     --seqBias --gcBias --posBias
 
 awk 'FNR == 1 {print $1"\t"$4"\t"$5}' $out/quant.sf > ${outPrefix}_hlaquant.tsv
@@ -43,4 +43,4 @@ awk '/IMGT/ {print $1"\t"$4"\t"$5}' $out/quant.sf >> ${outPrefix}_hlaquant.tsv
 
 mv ${outPrefix}_*Log.* ${outPrefix}_logs/
 
-rm -r $bampers $index $sample_gencode ${outPrefix}_SJ* 
+rm -r $bampers $index $sample_transcripts ${outPrefix}_SJ* 

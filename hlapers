@@ -50,6 +50,7 @@ usage_quant() {
     printf "%-20s %s\n" "-2 | --fq2" "Fastq for READ 2."
     printf "%-20s %s\n" "-p | --threads" "Number of threads."
     printf "%-20s %s\n" "-o | --out" "Output prefix name."
+    printf "%-20s %s\n" "--kallisto" "Use kallisto for quantification."
 }
 
 usage_bam2fq() {
@@ -251,6 +252,10 @@ run_quant() {
 		outprefix="$2"
 		shift 2
 		;;
+	    --kallisto)
+		kallisto=1
+		shift
+		;;
 	    *)
 		echo "ERROR: unknown parameter $1"
 		usage_quant
@@ -258,8 +263,18 @@ run_quant() {
 		;;
 	esac
     done
+    
+    kallisto=${k-0}
 
-    ./script/run_quant.sh $transcripts $hlafasta $fq1 $fq2 $outprefix $threads
+    if [[ "$kallisto" -eq 0 ]]; then
+
+	./script/run_quant.sh $transcripts $hlafasta $fq1 $fq2 $outprefix $threads
+    
+    elif [[ "$kallisto" -eq 1 ]]; then
+
+	./script/run_quantkallisto.sh $transcripts $hlafasta $fq1 $fq2 $outprefix $threads
+
+    fi
 }
 
 run_bam2fq() {

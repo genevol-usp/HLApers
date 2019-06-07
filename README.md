@@ -173,6 +173,7 @@ Proceed to the quantification step.
     -2 | --fq2           Fastq for READ 2.
     -p | --threads       Number of threads.
     -o | --out           Output prefix name.
+    --kallisto           Use kallisto for quantification.
 
 Example:
 
