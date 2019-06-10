@@ -17,16 +17,21 @@ fqnoWin1=${outPrefix}_noWin_1.fq
 fqnoWin2=${outPrefix}_noWin_2.fq
 outNoWin=${outPrefix}_NoWin_quants
 
+if file $fq1 | grep -q gzip ; then
+    readcommand=zcat
+else
+    readcommand="-"
+fi
+
 # Remap to supplemented index
 echo "Remapping extracted reads to personalized MHC index..."
 
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
-    --readFilesIn $fq1 $fq2\
+    --readFilesIn $fq1 $fq2 --readFilesCommand $readcommand\
     --outFilterMismatchNmax 1\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
     --winAnchorMultimapNmax 6000\
-    --alignTranscriptsPerReadNmax 100000\
     --alignEndsType EndToEnd\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\

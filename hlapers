@@ -191,7 +191,7 @@ run_genotype() {
 		shift 2
 		;;
 	    --kallisto)
-		kallisto=1
+		k=1
 		shift
 		;;
 	    *)
@@ -253,7 +253,7 @@ run_quant() {
 		shift 2
 		;;
 	    --kallisto)
-		kallisto=1
+		k=1
 		shift
 		;;
 	    *)
