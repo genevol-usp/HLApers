@@ -94,9 +94,9 @@ salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
 #Final gentotypes and personalized index
 Rscript ./script/write_final_genotypes.R $gencode $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
 
-mkdir -p ${outPrefix}_logs
+mkdir -p ${outPrefix}_log
 
-mv ${outPrefix}_MHC_Log* ${outPrefix}_logs/
+mv ${outPrefix}_MHC_Log* ${outPrefix}_log/
 mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
 
 rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\

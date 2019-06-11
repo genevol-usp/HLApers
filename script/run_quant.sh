@@ -14,6 +14,7 @@ bampers=${outPrefix}_Aligned.out.bam
 out=${outPrefix}_quant
 
 mkdir -p $index
+mkdir -p ${outPrefix}_log/
 
 cat $transcriptsNoHLA $samplehla > $sample_transcripts
 
@@ -41,6 +42,6 @@ salmon quant -t $sample_transcripts -l A -a $bampers -o $out -p $cpus \
 awk 'FNR == 1 {print $1"\t"$4"\t"$5}' $out/quant.sf > ${outPrefix}_hlaquant.tsv
 awk '/IMGT/ {print $1"\t"$4"\t"$5}' $out/quant.sf >> ${outPrefix}_hlaquant.tsv
 
-mv ${outPrefix}_*Log.* ${outPrefix}_logs/
+mv ${outPrefix}_*Log.* ${outPrefix}_log/
 
 rm -r $bampers $index $sample_transcripts ${outPrefix}_SJ* 
