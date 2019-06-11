@@ -12,8 +12,6 @@ index=${outPrefix}_index
 sample_transcripts=${outPrefix}_transcripts.fa
 out=${outPrefix}_quant
 
-mkdir -p $index
-
 cat $transcriptsNoHLA $samplehla > $sample_transcripts
 
 kallisto index -i $index $sample_transcripts
