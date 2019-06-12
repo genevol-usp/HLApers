@@ -18,4 +18,7 @@ kallisto index -i $index $sample_transcripts
 
 kallisto quant -i $index -t $cpus -o $out --bias $fq1 $fq2
 
+awk 'FNR == 1 {print $1"\t"$4"\t"$5}' $out/abundance.tsv > ${outPrefix}_hlaquant.tsv
+awk '/IMGT/ {print $1"\t"$4"\t"$5}' $out/abundance.tsv >> ${outPrefix}_hlaquant.tsv
+
 rm $sample_transcripts $index
