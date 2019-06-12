@@ -1,22 +1,28 @@
 #!/bin/bash
 
 hladb=$1
-samplehla=$2
+genos=$2
 fq1=$3
 fq2=$4
 outPrefix=$5
 cpus=$6
 
-transcriptsNoHLA=$hladb/gencode_noHLA.fa
-index=${outPrefix}_index
+transcripts=$hladb/transcripts_MHC_HLAsupp.fa
+
+Rscript script/write_pers_index.R $transcripts $genos $outPrefix 
+
+transcriptsNoHLA=$hladb/transcripts_noHLA.fa
+samplehla=${outPrefix}_index.fa
 sample_transcripts=${outPrefix}_transcripts.fa
+
+cat $transcriptsNoHLA $samplehla > $sample_transcripts
+
+index=${outPrefix}_index
 bampers=${outPrefix}_Aligned.out.bam
 out=${outPrefix}_quant
 
 mkdir -p $index
-mkdir -p ${outPrefix}_log/
-
-cat $transcriptsNoHLA $samplehla > $sample_transcripts
+mkdir -p ${outPrefix}_log
 
 STAR --runThreadN $cpus --runMode genomeGenerate --genomeDir $index\
     --genomeFastaFiles $sample_transcripts\
@@ -44,4 +50,4 @@ awk '/IMGT/ {print $1"\t"$4"\t"$5}' $out/quant.sf >> ${outPrefix}_hlaquant.tsv
 
 mv ${outPrefix}_*Log.* ${outPrefix}_log/
 
-rm -r $bampers $index $sample_transcripts ${outPrefix}_SJ* 
+rm -r $bampers $index $sample_transcripts $samplehla ${outPrefix}_SJ* 

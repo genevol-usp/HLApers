@@ -7,7 +7,6 @@ outPrefix   <- opts[2]
 
 abundance_file <- file.path(outPrefix, "abundance.tsv")
 outgenos <- file.path(outPrefix, "genotypes.tsv")
-outindex <- file.path(outPrefix, "index.fa")
 
 index <- Biostrings::readDNAStringSet(transcripts)
 
@@ -19,11 +18,4 @@ genos <- abundance_file %>%
     hla_genotype(th = 0.15) %>%
     filter(!is.na(allele))
 
-alleles <- genos %>%
-    pull(allele) %>%
-    str_split("-") %>%
-    unlist() %>%
-    unique()
-
 write_tsv(genos, outgenos)
-Biostrings::writeXStringSet(index[alleles], outindex)

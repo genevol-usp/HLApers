@@ -1,7 +1,7 @@
 #!/bin/bash
 
 index=$1
-gencode=$2
+transcripts=$2
 fq1=$3
 fq2=$4
 outPrefix=$5
@@ -40,12 +40,12 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
 # Quantify MHC expression
 echo "Genotyping HLA..." 
 
-salmon quant -t $gencode -l A -a $bammhc -o $outmhc -p $cpus
+salmon quant -t $transcripts -l A -a $bammhc -o $outmhc -p $cpus
 
 #Extract up to top 5 HLA alleles
 mkdir -p $persindex
 
-Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $gencode $persindex/hla.fa
+Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $transcripts $persindex/hla.fa
 
 #Requantify expression of the top5
 mkdir -p $outtop5
@@ -91,13 +91,13 @@ fi
 salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
     -o $outNoWin -p $cpus
 
-#Final gentotypes and personalized index
-Rscript ./script/write_final_genotypes.R $gencode $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
+#Final gentotypes
+Rscript ./script/write_final_genotypes.R $transcripts $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
 
 mkdir -p ${outPrefix}_log
 
 mv ${outPrefix}_MHC_Log* ${outPrefix}_log/
-mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_logs/ 
+mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_log/ 
 
 rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
     ${readsNoWin}* $fqnoWin1 $fqnoWin2 $outNoWin 

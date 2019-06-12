@@ -8,7 +8,6 @@ quants_2nd <- opts[3]
 outPrefix  <- opts[4] 
 
 outgenos <- paste0(outPrefix, "_genotypes.tsv")
-outindex <- paste0(outPrefix, "_index.fa")
 
 index <- Biostrings::readDNAStringSet(transcripts)
 
@@ -36,9 +35,3 @@ typings_df <- bind_rows(typings_1st, typings_2nd) %>%
 typings_df %>% 
     select(locus, allele) %>%
     write_tsv(outgenos)
-
-alleles <- typings_df %>%
-    pull(allele) %>%
-    unique()
-
-Biostrings::writeXStringSet(index[alleles], outindex)
