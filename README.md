@@ -15,10 +15,6 @@ Getting started
 
 ##### 3. In R, install the following packages
 
--   from CRAN:
-
-        install.packages(c("devtools", "tidyverse", "stringdist"))
-
 -   from Bioconductor:
 
 <!-- -->
@@ -28,29 +24,33 @@ Getting started
 
     BiocManager::install("Biostrings")
 
--   from GitHub:
+-   from GitHub: \`\`\` if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
 
-        devtools::install_github("genevol-usp/hlaseqlib")
+devtools::install\_github("genevol-usp/hlaseqlib")
 
-##### 4. For STAR-Salmon-based pipeline, install:
 
--   STAR v2.5.3a+
+    ##### 4. For STAR-Salmon-based pipeline, install:
 
--   Salmon v0.8.2+
+    - STAR v2.5.3a+
 
--   samtools 1.3+
+    - Salmon v0.8.2+
 
--   seqtk
+    - samtools 1.3+
 
-##### 5. For kallisto-based pipeline, install:
+    - seqtk
 
--   kallisto
 
-### Download data:
+    ##### 5. For kallisto-based pipeline, install:
 
-##### 1. IMGT database
+    - kallisto
 
-    git clone https://github.com/ANHIG/IMGTHLA.git
+
+    ### Download data:
+
+
+    ##### 1. IMGT database
+
+git clone <https://github.com/ANHIG/IMGTHLA.git> \`\`\`
 
 ##### 2. Gencode:
 
