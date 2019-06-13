@@ -1,4 +1,5 @@
-suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(readr))
 
 opts <- commandArgs(TRUE)
 quant_file <- opts[1]

@@ -1,5 +1,6 @@
 library(hlaseqlib)
-suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(readr))
 
 opts <- commandArgs(TRUE)
 transcripts <- opts[1]

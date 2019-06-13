@@ -1,6 +1,9 @@
 library(hlaseqlib)
 suppressPackageStartupMessages(library(Biostrings))
-suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(purrr))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(tidyr))
 
 # inputs
 opts <- commandArgs(TRUE)

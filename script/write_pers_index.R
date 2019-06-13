@@ -1,5 +1,4 @@
 library(hlaseqlib)
-suppressPackageStartupMessages(library(tidyverse))
 
 opts <- commandArgs(TRUE)
 transcripts<- opts[1]
@@ -10,10 +9,8 @@ outindex <- paste0(outPrefix, "_index.fa")
 
 index <- Biostrings::readDNAStringSet(transcripts)
 
-typings_df <- read_tsv(typings)
+typings_df <- readr::read_tsv(typings)
 
-alleles <- typings_df %>%
-    pull(allele) %>%
-    unique()
+alleles <- unique(typings_df$allele)
 
 Biostrings::writeXStringSet(index[alleles], outindex)
