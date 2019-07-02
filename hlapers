@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# script directory
+execdir="$( dirname "$0" )"
+scriptdir=$execdir/scriptdir
+
 # Usage functions
 usage() {
     echo "Usage: hlapers [modes]"
@@ -99,7 +103,7 @@ run_prepref () {
         esac
     done
         
-    Rscript ./script/make_index_files.R $transcripts $annotations $imgt $out
+    Rscript $scriptdir/make_index_files.R $transcripts $annotations $imgt $out
 }
 
 
@@ -144,11 +148,11 @@ run_index() {
 
     if [[ "$kallisto" -eq 0 ]]; then
 
-	./script/run_starindex.sh $transcripts $out $threads
+	$scriptdir/run_starindex.sh $transcripts $out $threads
 
     elif [[ "$kallisto" -eq 1 ]]; then
         
-        ./script/run_kallistoindex.sh $transcripts $out
+        $scriptdir/run_kallistoindex.sh $transcripts $out
 
     fi
 }
@@ -206,11 +210,11 @@ run_genotype() {
 
     if [[ "$kallisto" -eq 0 ]]; then
 
-	./script/run_genotyping.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+	$scriptdir/run_genotyping.sh $index $transcripts $fq1 $fq2 $outprefix $threads
 
     elif [[ "$kallisto" -eq 1 ]]; then
 
-	./script/run_genotypingkallisto.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+	$scriptdir/run_genotypingkallisto.sh $index $transcripts $fq1 $fq2 $outprefix $threads
 
     fi
 
@@ -268,11 +272,11 @@ run_quant() {
 
     if [[ "$kallisto" -eq 0 ]]; then
 
-	./script/run_quant.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
+	$scriptdir/run_quant.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
     
     elif [[ "$kallisto" -eq 1 ]]; then
 
-	./script/run_quantkallisto.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
+	$scriptdir/run_quantkallisto.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
 
     fi
 }
@@ -315,9 +319,9 @@ run_bam2fq() {
     done
 
     if [[ -n "$mhc" ]]; then
-	./script/run_bam2fq_mhc.sh $bam $mhc $out
+	$scriptdir/run_bam2fq_mhc.sh $bam $mhc $out
     else
-	./script/run_bam2fq.sh $bam $out
+	$scriptdir/run_bam2fq.sh $bam $out
     fi
 
 }
@@ -327,7 +331,6 @@ if [[ "$#" -eq 0 ]]; then
     usage
     exit 1
 fi
-
 
 while [[ $# -gt 0 ]]
 do
@@ -372,4 +375,3 @@ do
 	;;
     esac
 done
-
