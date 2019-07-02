@@ -1,8 +1,21 @@
 #!/bin/bash
 
 # script directory
-execdir="$( dirname "$0" )"
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+
+    myexecpath="$( readlink -f "$0" )"
+
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        
+    myexecpath="$( readlink "$0" )"
+
+else
+    myexecpath="$( pwd )"
+fi
+
+execdir="$( dirname "$myexecpath" )"
 scriptdir=$execdir/script
+
 
 # Usage functions
 usage() {
