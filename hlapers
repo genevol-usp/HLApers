@@ -16,7 +16,6 @@ fi
 execdir="$( dirname "$myexecpath" )"
 scriptdir=$execdir/script
 
-
 # Usage functions
 usage() {
     echo "Usage: hlapers [modes]"

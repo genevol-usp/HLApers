@@ -62,7 +62,7 @@ Getting started
 HLApers usage
 -------------
 
-Make sure hlapers is in your execution path, or change to the HLApers directory and execute the program with `./hlapers`.
+Link the hlapers executable in your execution path, or change to the HLApers directory and execute the program with `./hlapers`.
 
 ### Getting help
 
