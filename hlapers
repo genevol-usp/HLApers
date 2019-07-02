@@ -2,7 +2,7 @@
 
 # script directory
 execdir="$( dirname "$0" )"
-scriptdir=$execdir/scriptdir
+scriptdir=$execdir/script
 
 # Usage functions
 usage() {
