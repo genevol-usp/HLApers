@@ -1,0 +1,168 @@
+---
+title: ""
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
+```
+
+# HLApers
+
+## Getting started
+
+### Install required software
+
+##### 1. HLApers
+
+```
+git clone https://github.com/genevol-usp/HLApers.git
+```
+
+##### 2. R v3.4+
+
+##### 3. In R, install the following packages 
+
+- from Bioconductor:
+
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Biostrings")
+```
+
+- from GitHub:
+
+```
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+
+devtools::install_github("genevol-usp/hlaseqlib")
+``` 
+
+##### 4. For STAR-Salmon-based pipeline, install:
+
+- STAR v2.5.3a+
+
+- Salmon v0.8.2+
+
+- samtools 1.3+
+
+- seqtk
+
+
+##### 5. For kallisto-based pipeline, install:
+
+- kallisto
+
+
+### Download data:
+
+
+##### 1. IMGT database
+
+```
+git clone https://github.com/ANHIG/IMGTHLA.git
+```
+
+##### 2. Gencode:
+
+- transcripts fasta (e.g., Gencode v30 fasta)
+
+- corresponding annotations GTF (e.g., Gencode v30 GTF)
+
+
+
+## HLApers usage
+
+Make sure hlapers is in your execution path, or change to the HLApers directory and execute the program with `./hlapers`.
+
+
+### Getting help
+
+HLApers is composed of the following modes:
+
+```{bash}
+hlapers --help
+```
+
+
+### 1. Building a transcriptome supplemented with HLA sequences
+
+The first step is to use `hlapers prepare-ref` to build an index composed of
+Gencode transcripts, where we replace the HLA transcripts with IMGT HLA allele
+sequences.
+
+```{bash}
+hlapers prepare-ref --help
+```
+
+Example:
+
+```
+hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
+```
+
+### 2. Creating an index for read alignment
+
+```{bash}
+hlapers index --help
+```
+
+Example:
+
+```
+hlapers index -t hladb/transcripts_MHC_HLAsupp.fa -p 4 -o index
+```
+
+### 3. HLA genotyping
+
+Given a BAM file from a previous alignment to the genome, we first need to extract the reads mapped to the MHC region and those which are unmapped. For this, we can use the `bam2fq` utility.
+
+```{bash}
+hlapers bam2fq --help
+```
+
+Example:
+
+```
+hlapers bam2fq -b HG00096.bam -m ./hladb/mhc_coords.txt -o HG00096
+```
+
+Then we run the genotyping module.
+
+```{bash}
+hlapers genotype --help
+```
+
+Example:
+
+```
+hlapers genotype -i index/STARMHC -t ./hladb/transcripts_MHC_HLAsupp.fa -1 HG00096_mhc_1.fq -2 HG00096_mhc_2.fq -p 8 -o results/HG00096
+```
+
+
+### 4. Quantify HLA expression
+
+In order to quantify expression, we use the `quant` module. If the original fastq files are available, we can proceed directly to the quantification step. If only a BAM file of a previous alignment to the genome is available, we first need to convert the BAM to fastq using the `bam2fq` utility.
+
+Example:
+
+```
+hlapers bam2fq -b HG00096.bam -o HG00096
+```
+
+Proceed to the quantification step.
+
+
+```{bash}
+hlapers quant --help
+```
+
+Example:
+
+```
+hlapers quant -t ./hladb -g ./results/HG00096_genotypes.tsv -1 HG00096_1.fq.gz -2 HG00096_2.fq.gz -o ./results/HG00096 -p 8
+```
+

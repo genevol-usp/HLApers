@@ -24,33 +24,34 @@ Getting started
 
     BiocManager::install("Biostrings")
 
--   from GitHub: \`\`\` if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
+-   from GitHub:
 
-devtools::install\_github("genevol-usp/hlaseqlib")
+<!-- -->
 
+    if (!requireNamespace("devtools", quietly = TRUE))
+        install.packages("devtools")
 
-    ##### 4. For STAR-Salmon-based pipeline, install:
+    devtools::install_github("genevol-usp/hlaseqlib")
 
-    - STAR v2.5.3a+
+##### 4. For STAR-Salmon-based pipeline, install:
 
-    - Salmon v0.8.2+
+-   STAR v2.5.3a+
 
-    - samtools 1.3+
+-   Salmon v0.8.2+
 
-    - seqtk
+-   samtools 1.3+
 
+-   seqtk
 
-    ##### 5. For kallisto-based pipeline, install:
+##### 5. For kallisto-based pipeline, install:
 
-    - kallisto
+-   kallisto
 
+### Download data:
 
-    ### Download data:
+##### 1. IMGT database
 
-
-    ##### 1. IMGT database
-
-git clone <https://github.com/ANHIG/IMGTHLA.git> \`\`\`
+    git clone https://github.com/ANHIG/IMGTHLA.git
 
 ##### 2. Gencode:
 
@@ -61,12 +62,14 @@ git clone <https://github.com/ANHIG/IMGTHLA.git> \`\`\`
 HLApers usage
 -------------
 
+Make sure hlapers is in your execution path, or change to the HLApers directory and execute the program with `./hlapers`.
+
 ### Getting help
 
 HLApers is composed of the following modes:
 
 ``` bash
-./hlapers --help
+hlapers --help
 ```
 
     Usage: hlapers [modes]
@@ -82,7 +85,7 @@ HLApers is composed of the following modes:
 The first step is to use `hlapers prepare-ref` to build an index composed of Gencode transcripts, where we replace the HLA transcripts with IMGT HLA allele sequences.
 
 ``` bash
-./hlapers prepare-ref --help
+hlapers prepare-ref --help
 ```
 
     Usage: hlapers prepare-ref [options]
@@ -94,12 +97,12 @@ The first step is to use `hlapers prepare-ref` to build an index composed of Gen
 
 Example:
 
-    ./hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
+    hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
 
 ### 2. Creating an index for read alignment
 
 ``` bash
-./hlapers index --help
+hlapers index --help
 ```
 
     Usage: hlapers index [options]
@@ -111,14 +114,14 @@ Example:
 
 Example:
 
-    ./hlapers index -t hladb/transcripts_MHC_HLAsupp.fa -p 4 -o index
+    hlapers index -t hladb/transcripts_MHC_HLAsupp.fa -p 4 -o index
 
 ### 3. HLA genotyping
 
 Given a BAM file from a previous alignment to the genome, we first need to extract the reads mapped to the MHC region and those which are unmapped. For this, we can use the `bam2fq` utility.
 
 ``` bash
-./hlapers bam2fq --help
+hlapers bam2fq --help
 ```
 
     Usage: hlapers bam2fq [options]
@@ -129,12 +132,12 @@ Given a BAM file from a previous alignment to the genome, we first need to extra
 
 Example:
 
-    ./hlapers bam2fq -b HG00096.bam -m ./hladb/mhc_coords.txt -o HG00096
+    hlapers bam2fq -b HG00096.bam -m ./hladb/mhc_coords.txt -o HG00096
 
 Then we run the genotyping module.
 
 ``` bash
-./hlapers genotype --help
+hlapers genotype --help
 ```
 
     Usage: hlapers genotype [options]
@@ -149,7 +152,7 @@ Then we run the genotyping module.
 
 Example:
 
-    ./hlapers genotype -i index/STARMHC -t ./hladb/transcripts_MHC_HLAsupp.fa -1 HG00096_mhc_1.fq -2 HG00096_mhc_2.fq -p 8 -o results/HG00096
+    hlapers genotype -i index/STARMHC -t ./hladb/transcripts_MHC_HLAsupp.fa -1 HG00096_mhc_1.fq -2 HG00096_mhc_2.fq -p 8 -o results/HG00096
 
 ### 4. Quantify HLA expression
 
@@ -157,12 +160,12 @@ In order to quantify expression, we use the `quant` module. If the original fast
 
 Example:
 
-    ./hlapers bam2fq -b HG00096.bam -o HG00096
+    hlapers bam2fq -b HG00096.bam -o HG00096
 
 Proceed to the quantification step.
 
 ``` bash
-./hlapers quant --help
+hlapers quant --help
 ```
 
     Usage: hlapers quant [options]
@@ -177,4 +180,4 @@ Proceed to the quantification step.
 
 Example:
 
-    ./hlapers quant -t ./hladb -g ./results/HG00096_genotypes.tsv -1 HG00096_1.fq.gz -2 HG00096_2.fq.gz -o ./results/HG00096 -p 8
+    hlapers quant -t ./hladb -g ./results/HG00096_genotypes.tsv -1 HG00096_1.fq.gz -2 HG00096_2.fq.gz -o ./results/HG00096 -p 8
