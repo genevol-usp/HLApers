@@ -52,7 +52,7 @@ g_annot <- read_tsv(transcript_annot, comment = "##", col_names = FALSE,
 transcripts_db <- g_annot %>%
     filter(X3 == "transcript") %>%
     select(chr = X1, start = X4, end = X5, X9) %>%
-    mutate(i = seq_len(nrow(.)), X9 = str_split(X9, "; ")) %>%
+    mutate(i = seq_len(nrow(.)), X9 = strsplit(X9, "; ")) %>%
     unnest() %>%
     filter(grepl("^gene_name|^gene_id|^transcript_id", X9)) %>%
     separate(X9, c("tag", "id"), " ") %>%
