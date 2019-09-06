@@ -18,6 +18,8 @@ out_supp    <- file.path(out, "transcripts_HLAsupp.fa")
 out_MHCsupp <- file.path(out, "transcripts_MHC_HLAsupp.fa")
 out_coord   <- file.path(out, "mhc_coords.txt") 
 
+if (!file.exists(out)) dir.create(out)
+
 # HLA database
 imgt_loci <-
     file.path(imgt_db, "alignments") %>%
