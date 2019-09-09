@@ -11,6 +11,6 @@ index <- Biostrings::readDNAStringSet(transcripts)
 
 typings_df <- readr::read_tsv(typings)
 
-alleles <- unique(typings_df$allele)
+alleles <- unlist(strsplit(unique(typings_df$allele), "-"))
 
 Biostrings::writeXStringSet(index[alleles], outindex)
