@@ -2,6 +2,11 @@
 HLApers
 =======
 
+License
+-------
+
+HLApers integrates software such as kallisto, Salmon and STAR. Before using it, please read the license notices [here](https://github.com/genevol-usp/HLApers/blob/Latest/license.txt)
+
 Getting started
 ---------------
 
