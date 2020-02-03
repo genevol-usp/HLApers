@@ -50,7 +50,7 @@ Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $transcripts $persindex/hla
 #Requantify expression of the top5
 mkdir -p $outtop5
 
-salmon index -t $persindex/hla.fa -i $persindex/salmon --type quasi -k 31
+salmon index -t $persindex/hla.fa -i $persindex/salmon
 
 salmon quant -i $persindex/salmon -l A -1 $fq1 -2 $fq2 -o $outtop5\
     -p $cpus --writeMappings=$outtop5/mappings.sam
