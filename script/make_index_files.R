@@ -60,13 +60,12 @@ transcripts_db <- g_annot %>%
 
 mhc_coords <- transcripts_db %>%
     filter(chr == "chr6" | chr == 6, gene_name %in% hladb_genes) %>%
-    summarise(start = min(start) -5e5, end = max(end) + 5e5)
+    summarise(chr = unique(chr), start = min(start) -5e5, end = max(end) + 5e5)
 
 mhc_coords %>%
-    mutate(out = paste0("chr6:", start, "-", end)) %>%
+    mutate(out = paste0(chr, ":", start, "-", end)) %>%
     pull(out) %>%
     writeLines(out_coord)
-
 
 # Transcript sequences
 transcripts <- readDNAStringSet(transcript_fasta) %>%
