@@ -48,7 +48,7 @@ hladb_genes <- unique(sub("^IMGT_([^\\*]+).+$", "HLA-\\1", names(hladb)))
 
 # Annotations
 message("Reading transcript annotations...")
-g_annot <- read_tsv(transcript_annot, comment = "##", col_names = FALSE, 
+g_annot <- read_tsv(transcript_annot, comment = "#", col_names = FALSE, 
 		    col_types = "ccciicccc", progress = FALSE) 
 
 transcripts_db <- g_annot %>%
