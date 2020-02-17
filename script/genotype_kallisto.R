@@ -3,13 +3,10 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 opts <- commandArgs(TRUE)
-transcripts <- opts[1]
-outPrefix   <- opts[2]
+outPrefix   <- opts[1]
 
 abundance_file <- file.path(outPrefix, "abundance.tsv")
 outgenos <- file.path(outPrefix, "genotypes.tsv")
-
-index <- Biostrings::readDNAStringSet(transcripts)
 
 genos <- abundance_file %>% 
     read_tsv() %>% 

@@ -226,7 +226,7 @@ run_genotype() {
 
     elif [[ "$kallisto" -eq 1 ]]; then
 
-	$scriptdir/run_genotypingkallisto.sh $index $transcripts $fq1 $fq2 $outprefix $threads
+	$scriptdir/run_genotypingkallisto.sh $index $fq1 $fq2 $outprefix $threads
 
     fi
 
