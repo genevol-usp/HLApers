@@ -1,5 +1,6 @@
 #!/bin/bash
 
+DIR=$( dirname "$0")
 hladb=$1
 genos=$2
 fq1=$3
@@ -9,7 +10,7 @@ cpus=$6
 
 transcripts=$hladb/transcripts_MHC_HLAsupp.fa
 
-Rscript script/write_pers_index.R $transcripts $genos $outPrefix
+Rscript $DIR/write_pers_index.R $transcripts $genos $outPrefix
 
 transcriptsNoHLA=$hladb/transcripts_noHLA.fa
 samplehla=${outPrefix}_index.fa

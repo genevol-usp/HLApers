@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # script directory
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -66,6 +66,7 @@ usage_quant() {
     printf "%-20s %s\n" "-2 | --fq2" "Fastq for READ 2."
     printf "%-20s %s\n" "-p | --threads" "Number of threads."
     printf "%-20s %s\n" "-o | --out" "Output prefix name."
+    printf "%-20s %s\n" "--salmonreads" "Use Salmon lightweight alignment for quantification (NOT TESTED)"
     printf "%-20s %s\n" "--kallisto" "Use kallisto for quantification."
 }
 
@@ -272,6 +273,10 @@ run_quant() {
 		k=1
 		shift
 		;;
+	    --salmonreads)
+		s=1
+		shift
+		;;
 	    *)
 		echo "ERROR: unknown parameter $1"
 		usage_quant
@@ -281,14 +286,19 @@ run_quant() {
     done
     
     kallisto=${k-0}
+    salmonreads=${s-0}
 
-    if [[ "$kallisto" -eq 0 ]]; then
+    if [[ "$kallisto" -eq 0 ]] && [[ "$salmonreads" -eq 0 ]]; then
 
 	$scriptdir/run_quant.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
     
-    elif [[ "$kallisto" -eq 1 ]]; then
+    elif [[ "$kallisto" -eq 1 ]] && [[ "$salmonreads" -eq 0 ]]; then
 
 	$scriptdir/run_quantkallisto.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
+
+    elif [[ "$kallisto" -eq 0 ]] && [[ "$salmonreads" -eq 1 ]]; then
+
+	$scriptdir/run_quantSalmonReads.sh $transcripts $genos $fq1 $fq2 $outprefix $threads
 
     fi
 }

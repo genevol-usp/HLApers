@@ -21,19 +21,13 @@ out_coord   <- file.path(out, "mhc_coords.txt")
 if (!file.exists(out)) dir.create(out)
 
 # HLA database
-imgt_loci <-
-    file.path(imgt_db, "alignments") %>%
-    list.files(pattern = "_nuc\\.txt") %>% 
-    strsplit("_") %>% 
-    map_chr(1) %>%
-    .[!. %in% c("ClassI", "ClassII", "HFE", "MICA", "MICB", "TAP1", "TAP2")]
-    
-imgt_genes <- imgt_loci %>%
-    .[. != "DRB"] %>%
-    c(paste0("DRB", 1:9)) %>% 
-    sort()
+imgt_loci <- c("A", "B", "C", "E", "F", "G", "H",
+	       "DMA", "DMB", "DOA", "DOB",
+	       "DPA1", "DPA2", "DPB1", "DPB2", 
+	       "DQA1", "DQA2", "DQB1", 
+	       "DRA", "DRB1", "DRB3", "DRB4", "DRB5")
 
-hladb <- tibble(locus = imgt_genes) %>%
+hladb <- tibble(locus = imgt_loci) %>%
     mutate(data = map(locus, ~hla_compile_index(., imgt_db))) %>%
     filter(!is.na(data)) %>%
     unnest(data) %>%
