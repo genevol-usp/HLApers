@@ -27,7 +27,24 @@ imgt_loci <- c("A", "B", "C", "E", "F", "G", "H",
 	       "DQA1", "DQA2", "DQB1", 
 	       "DRA", "DRB1", "DRB3", "DRB4", "DRB5")
 
-hladb <- tibble(locus = imgt_loci) %>%
+present_loci <- 
+    list.files(file.path(imgt_db, "alignments"), full.names = TRUE) %>%
+    .[grep("nuc", .)] %>%
+    .[!grepl("(Class)|(HFE)|(TAP)|(MIC)", .)] %>%
+    map(. %>%
+	readLines() %>% 
+	trimws() %>%
+	.[grep("^[A-Z1-9]+\\*\\d+:", .)] %>%
+	sub("^([^*]+).*$", "\\1", .) %>%
+	unique()) %>%
+    unlist()
+
+imgt_loci_inc <- imgt_loci[imgt_loci %in% present_loci] 
+
+message(paste("HLApers found data for the following loci, which will be personalized:",
+	      paste(imgt_loci_inc, collapse = ", ")))
+
+hladb <- tibble(locus = imgt_loci_inc) %>%
     mutate(data = map(locus, ~hla_compile_index(., imgt_db))) %>%
     filter(!is.na(data)) %>%
     unnest(data) %>%
