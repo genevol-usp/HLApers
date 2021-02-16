@@ -87,17 +87,7 @@ transcripts_no_hla <- transcripts_db %>%
     pull(transcript_id) %>%
     transcripts[.]
 
-transcripts_no_hla_uniq <-
-    tibble(tx_id = names(transcripts_no_hla), 
-	   cds = as.character(transcripts_no_hla)) %>%
-    group_by(cds) %>%
-    summarise(tx_id = paste(tx_id, collapse = "-")) %>%
-    ungroup() %>%
-    split(.$tx_id) %>%
-    map_chr("cds") %>%
-    DNAStringSet()
-
-transcripts_hlasupp <- c(transcripts_no_hla_uniq, hladb) 
+transcripts_hlasupp <- c(transcripts_no_hla, hladb) 
 
 mhc_transc_ids <- transcripts_db %>%
     filter(chr == "chr6" | chr == 6, start >= mhc_coords$start, end <= mhc_coords$end, 
@@ -108,9 +98,6 @@ transcripts_mhc <-
     tibble(tx_id = names(transcripts_no_hla), 
 	   cds = as.character(transcripts_no_hla)) %>%
     filter(tx_id %in% mhc_transc_ids) %>%
-    group_by(cds) %>%
-    summarise(tx_id = paste(tx_id, collapse = "-")) %>%
-    ungroup() %>%
     split(.$tx_id) %>%
     map_chr("cds") %>%
     DNAStringSet()
@@ -119,7 +106,7 @@ transcripts_mhc_supp <- c(transcripts_mhc, hladb)
 
 message("writing index files...")
 writeXStringSet(transcripts_hlasupp, out_supp)
-writeXStringSet(transcripts_no_hla_uniq, out_noHLA)
+writeXStringSet(transcripts_no_hla, out_noHLA)
 writeXStringSet(transcripts_mhc_supp, out_MHCsupp)
 
 message("Done!")
