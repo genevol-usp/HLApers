@@ -1,12 +1,13 @@
 #!/bin/bash
 
+DIR=$( dirname "$0" )
 transcripts=$1
 out=$2
 threads=$3
 
 mkdir -p $out
 
-Rscript ./script/calc_starindex_params.R $transcripts $out
+Rscript $DIR/calc_starindex_params.R $transcripts $out
 
 binbits=$(awk 'FNR == 1' $out/indexparams.txt)
 saindex=$(awk 'FNR == 2' $out/indexparams.txt)
