@@ -1,5 +1,6 @@
 #!/bin/bash
 
+DIR=$( dirname "$0" )
 index=$1
 transcripts=$2
 fq1=$3
@@ -45,7 +46,7 @@ salmon quant -t $transcripts -l A -a $bammhc -o $outmhc -p $cpus
 #Extract up to top 5 HLA alleles
 mkdir -p $persindex
 
-Rscript ./script/write_top5_fasta.R $outmhc/quant.sf $transcripts $persindex/hla.fa
+Rscript $DIR/write_top5_fasta.R $outmhc/quant.sf $transcripts $persindex/hla.fa
 
 #Requantify expression of the top5
 mkdir -p $outtop5
@@ -55,7 +56,7 @@ salmon index -t $persindex/hla.fa -i $persindex/salmon
 salmon quant -i $persindex/salmon -l A -1 $fq1 -2 $fq2 -o $outtop5\
     -p $cpus --writeMappings=$outtop5/mappings.sam
 
-Rscript ./script/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
+Rscript $DIR/write_winners.R $outtop5/quant.sf $outtop5/winners.txt
 
 #Remove reads from the winner alleles
 samtools view $outtop5/mappings.sam |\
@@ -92,7 +93,7 @@ salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
     -o $outNoWin -p $cpus
 
 #Final gentotypes
-Rscript ./script/write_final_genotypes.R $transcripts $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
+Rscript $DIR/write_final_genotypes.R $transcripts $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
 
 mkdir -p ${outPrefix}_log
 
