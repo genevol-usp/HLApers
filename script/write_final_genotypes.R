@@ -33,6 +33,7 @@ typings_df <- bind_rows(typings_1st, typings_2nd) %>%
     arrange(locus) %>%
     hla_genotype(th = 0.05)
 
-typings_df %>% 
+typings_df %>%
+    filter(!is.na(allele)) %>%
     select(locus, allele) %>%
     write_tsv(outgenos)
