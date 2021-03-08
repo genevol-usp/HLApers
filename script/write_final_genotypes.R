@@ -20,18 +20,27 @@ typings_1st <- quants_1st %>%
     slice(which.max(counts)) %>%
     ungroup()
 
-typings_2nd <- quants_2nd %>%
-    read_tsv() %>%
-    mutate(locus = sub("^IMGT_([^\\*]+).+$", "\\1", Name)) %>%
-    select(locus, allele = Name, counts = NumReads, tpm = TPM) %>% 
-    group_by(locus) %>%
-    slice(which.max(counts)) %>%
-    ungroup() %>%
-    filter(counts > 0)
+if (file.exists(quants_2nd)) {
 
-typings_df <- bind_rows(typings_1st, typings_2nd) %>%
-    arrange(locus) %>%
-    hla_genotype(th = 0.05)
+    typings_2nd <- quants_2nd %>%
+	read_tsv() %>%
+	mutate(locus = sub("^IMGT_([^\\*]+).+$", "\\1", Name)) %>%
+	select(locus, allele = Name, counts = NumReads, tpm = TPM) %>% 
+	group_by(locus) %>%
+	slice(which.max(counts)) %>%
+	ungroup() %>%
+	filter(counts > 0)
+
+    typings_df <- bind_rows(typings_1st, typings_2nd) %>%
+	arrange(locus) %>%
+	hla_genotype(th = 0.05)
+
+} else {
+    
+    typings_df <- typings_1st %>%
+	arrange(locus) %>%
+	hla_genotype(th = 0.05)
+}
 
 typings_df %>%
     filter(!is.na(allele)) %>%
