@@ -89,8 +89,10 @@ fi
 #Requantify to see if winner alleles explain all the expression or if 
 # there is other relevant allele
 
-salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
-    -o $outNoWin -p $cpus
+if [[ -s "$fqnoWin1" ]] && [[ -s "$fqnoWin2" ]]; then 
+    salmon quant -i $persindex/salmon -l A -1 $fqnoWin1 -2 $fqnoWin2\
+	-o $outNoWin -p $cpus
+fi
 
 #Final gentotypes
 Rscript $DIR/write_final_genotypes.R $transcripts $outtop5/quant.sf $outNoWin/quant.sf $outPrefix 
