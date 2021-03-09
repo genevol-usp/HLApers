@@ -74,8 +74,9 @@ usage_bam2fq() {
     echo "Usage: hlapers bam2fq [options]"
     echo ""
     printf "%-20s %s\n" "-m | --mhc-coords" "Genomic coordinates of the MHC region in chrN:start-end format if MHC fastq is desired."
-    printf "%-20s %s\n" "-b | --bam" "BAM file."
+    printf "%-20s %s\n" "-b | --bam" "BAM file (if -m is specified, needs to be sorted by coordinate; otherwise use --sort)."
     printf "%-20s %s\n" "-o | --outprefix" "Output prefix name."
+    printf "%-20s %s\n" "--sort" "Sort input BAM file by coordinate (REQUIRED if -m is specified and BAM is not sorted by coordinate)."
 }
 
 # Mode functions
@@ -332,6 +333,10 @@ run_bam2fq() {
 		out="$2"
 		shift 2
 		;;
+	    --sort)
+		s=1
+		shift
+		;;
 	    *)
 		echo "ERROR: unknown parameter $1"
 		usage_bam2fq
@@ -340,10 +345,12 @@ run_bam2fq() {
 	esac
     done
 
+    sort=${s-0}
+
     if [[ -n "$mhc" ]]; then
-	$scriptdir/run_bam2fq_mhc.sh $bam $mhc $out
+	$scriptdir/run_bam2fq_mhc.sh $bam $mhc $out $sort
     else
-	$scriptdir/run_bam2fq.sh $bam $out
+	$scriptdir/run_bam2fq.sh $bam $out $sort
     fi
 
 }

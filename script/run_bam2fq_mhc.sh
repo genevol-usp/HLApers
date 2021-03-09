@@ -3,12 +3,14 @@
 bam=$1
 mhccoords=$2
 outPrefix=$3
+dosorting=$4
 
 mhc=$(cat $mhccoords)
 
 mapbam=${outPrefix}_map.bam 
 unmapbam=${outPrefix}_unmap.bam
 tmpbam=${outPrefix}_tmp.bam
+sortbam=${outPrefix}_tmpsorted.bam
 tmpfq1=${outPrefix}_tmp_1.fq
 tmpfq2=${outPrefix}_tmp_2.fq
 reads1tmp=${outPrefix}_reads1.tmp
@@ -19,15 +21,26 @@ reads2=${outPrefix}_reads2
 finalfq1=${outPrefix}_mhc_unmap_1.fq
 finalfq2=${outPrefix}_mhc_unmap_2.fq
 
-echo "Extracting MHC and unmapped reads from BAM..."
-
-if [[ ! -f "$bam".bai ]]; then
-    samtools index $bam $bam.bai
+if [[ "$dosorting" -eq 1 ]]; then
+    echo "Sorting BAM file..."
+    samtools sort -o $sortbam $bam
+else
+    sortbam=$bam
 fi
 
-samtools view $bam $mhc -b -o $mapbam
-samtools view -F 0x2 $bam -b -o $unmapbam
+echo "Extracting MHC and unmapped reads from BAM..."
+
+if [[ ! -f "$sortbam".bai ]]; then
+    samtools index $sortbam ${sortbam}.bai
+fi
+
+samtools view $sortbam $mhc -b -o $mapbam
+samtools view -F 0x2 $sortbam -b -o $unmapbam
 samtools merge $tmpbam $mapbam $unmapbam 
+
+if [[ -f "${outPrefix}"_tmpsorted.bam ]]; then
+    rm ${outPrefix}_tmpsorted.bam 
+fi
 
 samtools sort -n $tmpbam | samtools fastq -1 $tmpfq1 -2 $tmpfq2 -0 /dev/null -
 
