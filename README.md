@@ -1,73 +1,72 @@
 
-HLApers
-=======
+# HLApers
 
-License
--------
+## License
 
-HLApers integrates software such as kallisto, Salmon and STAR. Before using it, please read the license notices [here](https://github.com/genevol-usp/HLApers/blob/Latest/license.txt)
+HLApers integrates software such as kallisto, Salmon and STAR. Before
+using it, please read the license notices
+[here](https://github.com/genevol-usp/HLApers/blob/Latest/license.txt)
 
-Getting started
----------------
+## Getting started
 
 ### Install required software
 
-##### 1. HLApers
+##### 1\. HLApers
 
     git clone https://github.com/genevol-usp/HLApers.git
 
-##### 2. R v3.4+
+##### 2\. R v3.4+
 
-##### 3. In R, install the following packages
+##### 3\. In R, install the following packages
 
--   from Bioconductor:
+  - from Bioconductor:
 
-<!-- -->
+<!-- end list -->
 
     if (!requireNamespace("BiocManager", quietly = TRUE))
         install.packages("BiocManager")
-
+    
     BiocManager::install("Biostrings")
 
--   from GitHub:
+  - from GitHub:
 
-<!-- -->
+<!-- end list -->
 
     if (!requireNamespace("devtools", quietly = TRUE))
         install.packages("devtools")
-
+    
     devtools::install_github("genevol-usp/hlaseqlib")
 
-##### 4. For STAR-Salmon-based pipeline, install:
+##### 4\. For STAR-Salmon-based pipeline, install:
 
--   STAR v2.5.3a+
+  - STAR v2.5.3a+
 
--   Salmon v0.8.2+
+  - Salmon v0.8.2+
 
--   samtools 1.3+
+  - samtools 1.3+
 
--   seqtk
+  - seqtk
 
-##### 5. For kallisto-based pipeline, install:
+##### 5\. For kallisto-based pipeline, install:
 
--   kallisto
+  - kallisto
 
 ### Download data:
 
-##### 1. IMGT database
+##### 1\. IMGT database
 
     git clone https://github.com/ANHIG/IMGTHLA.git
 
-##### 2. Gencode:
+##### 2\. Gencode:
 
--   transcripts fasta (e.g., Gencode v30 fasta)
+  - transcripts fasta (e.g., Gencode v37 fasta)
 
--   corresponding annotations GTF (e.g., Gencode v30 GTF)
+  - corresponding annotations GTF (e.g., Gencode v37 GTF)
 
-HLApers usage
--------------
+## HLApers usage
 
-Link the hlapers executable in your execution path, or change to the HLApers directory and execute the program with `./hlapers`.
+Link the hlapers executable in your execution path, or change to the
+HLApers directory and execute the program with `./hlapers`.
 
 ### Getting help
 
@@ -78,23 +77,25 @@ hlapers --help
 ```
 
     Usage: hlapers [modes]
-
+    
     prepare-ref          Prepare transcript fasta files.
     index                Create index for read alignment.
     bam2fq               Convert BAM to fastq.
     genotype             Infer HLA genotypes.
     quant                Quantify HLA expression.
 
-### 1. Building a transcriptome supplemented with HLA sequences
+### 1\. Building a transcriptome supplemented with HLA sequences
 
-The first step is to use `hlapers prepare-ref` to build an index composed of Gencode transcripts, where we replace the HLA transcripts with IMGT HLA allele sequences.
+The first step is to use `hlapers prepare-ref` to build an index
+composed of Gencode transcripts, where we replace the HLA transcripts
+with IMGT HLA allele sequences.
 
 ``` bash
 hlapers prepare-ref --help
 ```
 
     Usage: hlapers prepare-ref [options]
-
+    
     -t | --transcripts   Fasta with Gencode transcript sequences.
     -a | --annotations   GTF from Gencode for the same Genome version.
     -i | --imgt          Path to IMGT directory.
@@ -102,16 +103,16 @@ hlapers prepare-ref --help
 
 Example:
 
-    hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
+    hlapers prepare-ref -t gencode.v37.transcripts.fa.gz -a gencode.v37.annotation.gtf.gz -i IMGTHLA -o hladb
 
-### 2. Creating an index for read alignment
+### 2\. Creating an index for read alignment
 
 ``` bash
 hlapers index --help
 ```
 
     Usage: hlapers index [options]
-
+    
     -t | --transcripts   Fasta with Gencode transcript sequences.
     -p | --threads       Number of threads.
     -o | --out           Output directory.
@@ -121,19 +122,22 @@ Example:
 
     hlapers index -t hladb/transcripts_MHC_HLAsupp.fa -p 4 -o index
 
-### 3. HLA genotyping
+### 3\. HLA genotyping
 
-Given a BAM file from a previous alignment to the genome, we first need to extract the reads mapped to the MHC region and those which are unmapped. For this, we can use the `bam2fq` utility.
+Given a BAM file from a previous alignment to the genome, we first need
+to extract the reads mapped to the MHC region and those which are
+unmapped. For this, we can use the `bam2fq` utility.
 
 ``` bash
 hlapers bam2fq --help
 ```
 
     Usage: hlapers bam2fq [options]
-
+    
     -m | --mhc-coords    Genomic coordinates of the MHC region in chrN:start-end format if MHC fastq is desired.
-    -b | --bam           BAM file.
+    -b | --bam           BAM file (if -m is specified, needs to be sorted by coordinate; otherwise use --sort).
     -o | --outprefix     Output prefix name.
+    --sort               Sort input BAM file by coordinate (REQUIRED if -m is specified and BAM is not sorted by coordinate).
 
 Example:
 
@@ -146,10 +150,10 @@ hlapers genotype --help
 ```
 
     Usage: hlapers genotype [options]
-
+    
     -i | --index         Index generated by 'hlapers index'.
     -t | --transcripts   Fasta with Gencode transcripts sequences used for 'hlapers index'.
-    -1 | --fq1           Fastq for READ1.
+    -1 | --fq1           Fastq for READ 1.
     -2 | --fq2           Fastq for READ 2.
     -p | --threads       Number of threads.
     -o | --outprefix     Output prefix name.
@@ -159,9 +163,13 @@ Example:
 
     hlapers genotype -i index/STARMHC -t ./hladb/transcripts_MHC_HLAsupp.fa -1 HG00096_mhc_1.fq -2 HG00096_mhc_2.fq -p 8 -o results/HG00096
 
-### 4. Quantify HLA expression
+### 4\. Quantify HLA expression
 
-In order to quantify expression, we use the `quant` module. If the original fastq files are available, we can proceed directly to the quantification step. If only a BAM file of a previous alignment to the genome is available, we first need to convert the BAM to fastq using the `bam2fq` utility.
+In order to quantify expression, we use the `quant` module. If the
+original fastq files are available, we can proceed directly to the
+quantification step. If only a BAM file of a previous alignment to the
+genome is available, we first need to convert the BAM to fastq using the
+`bam2fq` utility.
 
 Example:
 
@@ -174,13 +182,14 @@ hlapers quant --help
 ```
 
     Usage: hlapers quant [options]
-
+    
     -t | --transcripts   Reference transcripts directory.
     -g | --genotypes     *_genotypes.tsv file generated by 'hlapers genotype'.
     -1 | --fq1           Fastq for READ 1.
     -2 | --fq2           Fastq for READ 2.
     -p | --threads       Number of threads.
     -o | --out           Output prefix name.
+    --salmonreads        Use Salmon lightweight alignment for quantification (NOT TESTED)
     --kallisto           Use kallisto for quantification.
 
 Example:

@@ -4,7 +4,7 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, comment = "")
+knitr::opts_chunk$set(echo = TRUE, comment = "", engine.opts = list(bash = "-l"))
 ```
 
 # HLApers
@@ -72,9 +72,9 @@ git clone https://github.com/ANHIG/IMGTHLA.git
 
 ##### 2. Gencode:
 
-- transcripts fasta (e.g., Gencode v30 fasta)
+- transcripts fasta (e.g., Gencode v37 fasta)
 
-- corresponding annotations GTF (e.g., Gencode v30 GTF)
+- corresponding annotations GTF (e.g., Gencode v37 GTF)
 
 
 
@@ -105,7 +105,7 @@ hlapers prepare-ref --help
 Example:
 
 ```
-hlapers prepare-ref -t gencode.v25.transcripts.fa.gz -a gencode.v25.annotation.gtf.gz -i IMGTHLA -o hladb
+hlapers prepare-ref -t gencode.v37.transcripts.fa.gz -a gencode.v37.annotation.gtf.gz -i IMGTHLA -o hladb
 ```
 
 ### 2. Creating an index for read alignment
