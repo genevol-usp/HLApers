@@ -17,6 +17,7 @@ out_noHLA   <- file.path(out, "transcripts_noHLA.fa")
 out_supp    <- file.path(out, "transcripts_HLAsupp.fa")
 out_MHCsupp <- file.path(out, "transcripts_MHC_HLAsupp.fa")
 out_coord   <- file.path(out, "mhc_coords.txt") 
+out_bed <- file.path(out, "hla.bed")
 
 if (!file.exists(out)) dir.create(out)
 
@@ -110,3 +111,7 @@ writeXStringSet(transcripts_no_hla, out_noHLA)
 writeXStringSet(transcripts_mhc_supp, out_MHCsupp)
 
 message("Done!")
+
+bed <- tibble(chr = names(hladb), start = 0, end = width(hladb))
+
+write_tsv(bed, out_bed, col_names = FALSE)

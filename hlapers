@@ -54,7 +54,7 @@ usage_genotype() {
     printf "%-20s %s\n" "-2 | --fq2" "Fastq for READ 2."
     printf "%-20s %s\n" "-p | --threads" "Number of threads."
     printf "%-20s %s\n" "-o | --outprefix" "Output prefix name."
-    printf "%-20s %s\n" "--kallisto" "Use kallisto for genotyping."
+    printf "%-20s %s\n" "--kallisto" "Use kallisto for genotyping. [NOT WORKING!]"
 }
 
 usage_quant() {

@@ -9,6 +9,7 @@ outPrefix=$5
 cpus=$6
 
 bammhc=${outPrefix}_MHC_Aligned.out.bam
+bammhcsort=${outPrefix}_MHC_Aligned_sorted.out.bam
 outmhc=${outPrefix}_MHC_quants
 persindex=${outPrefix}_persindex
 outtop5=${outPrefix}_top5_quants
@@ -17,6 +18,7 @@ readsNoWin=${outPrefix}_readsNoWin.txt
 fqnoWin1=${outPrefix}_noWin_1.fq
 fqnoWin2=${outPrefix}_noWin_2.fq
 outNoWin=${outPrefix}_NoWin_quants
+hlabed=$( dirname $transcripts )/hla.bed
 
 if file $fq1 | grep -q gzip ; then
     readcommand=zcat
@@ -38,6 +40,11 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_MHC_  
 
+
+samtools sort -@ $cpus -o $bammhcsort $bammhc
+samtools index -@ $cpus $bammhcsort
+samtools depth -a -b $hlabed -o ${outPrefix}.depth $bammhcsort
+
 # Quantify MHC expression
 echo "Genotyping HLA..." 
 
@@ -46,7 +53,7 @@ salmon quant -t $transcripts -l A -a $bammhc -o $outmhc -p $cpus
 #Extract up to top 5 HLA alleles
 mkdir -p $persindex
 
-Rscript $DIR/write_top5_fasta.R $outmhc/quant.sf $transcripts $persindex/hla.fa
+Rscript $DIR/write_top5_fasta.R $outmhc/quant.sf $transcripts ${outPrefix}.depth $persindex/hla.fa
 
 #Requantify expression of the top5
 mkdir -p $outtop5
@@ -102,7 +109,7 @@ mkdir -p ${outPrefix}_log
 mv ${outPrefix}_MHC_Log* ${outPrefix}_log/
 mv ${outPrefix}_MHC_quants/logs/salmon_quant.log ${outPrefix}_log/ 
 
-rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
-    ${readsNoWin}* $fqnoWin1 $fqnoWin2 $outNoWin 
-
+#rm -r ${outPrefix}_MHC* $persindex $outtop5 $readsWin\
+#    ${readsNoWin}* $fqnoWin1 $fqnoWin2 $outNoWin 
+#
 echo "Done!" 
