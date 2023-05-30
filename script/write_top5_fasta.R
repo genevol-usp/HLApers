@@ -26,7 +26,7 @@ top_alleles <- imgt_quants %>%
     ungroup() %>%
     left_join(depth_df, by = c("allele")) %>%
     group_by(locus, lineage) %>%
-    top_n(1, s) %>%
+    filter(s/max(s) >= .95) %>%
     filter(est_counts/max(est_counts) > 0.2) %>%
     group_by(locus) %>%
     filter(d/max(d) >= .7) %>%

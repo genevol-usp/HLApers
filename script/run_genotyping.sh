@@ -31,7 +31,7 @@ echo "Remapping extracted reads to personalized MHC index..."
 
 STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --readFilesIn $fq1 $fq2 --readFilesCommand $readcommand\
-    --outFilterMismatchNmax 1\
+    --outFilterMismatchNmax 0\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
     --winAnchorMultimapNmax 6000\
@@ -39,7 +39,6 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_MHC_  
-
 
 samtools sort -@ $cpus -o $bammhcsort $bammhc
 samtools index -@ $cpus $bammhcsort
