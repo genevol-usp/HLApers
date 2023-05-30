@@ -35,7 +35,7 @@ STAR --runMode alignReads --runThreadN $cpus --genomeDir $index\
     --outFilterMultimapScoreRange 0\
     --outFilterMultimapNmax 3000\
     --winAnchorMultimapNmax 6000\
-    --alignEndsType EndToEnd\
+    --alignEndsType Local\
     --outSAMprimaryFlag AllBestScore\
     --outSAMtype BAM Unsorted\
     --outFileNamePrefix ${outPrefix}_MHC_  
